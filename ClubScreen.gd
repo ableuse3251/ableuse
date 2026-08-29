@@ -28,8 +28,6 @@ func _build_ui() -> void:
 	top_panel.custom_minimum_size = Vector2(0, 60)
 	var top_style := StyleBoxFlat.new()
 	top_style.bg_color = Color(0.055, 0.07, 0.10, 0.95)
-	top_style.corner_radius_top_left = 0
-	top_style.corner_radius_top_right = 0
 	top_style.corner_radius_bottom_left = 12
 	top_style.corner_radius_bottom_right = 12
 	top_panel.add_theme_stylebox_override("panel", top_style)
@@ -47,7 +45,7 @@ func _build_ui() -> void:
 	top_margin.add_child(top_hbox)
 
 	var title := Label.new()
-	title.text = "МОЙ КЛУБ"
+	title.text = "МОЯ КОЛЛЕКЦИЯ"
 	title.add_theme_font_size_override("font_size", 24)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
 	top_hbox.add_child(title)
@@ -57,7 +55,7 @@ func _build_ui() -> void:
 	top_hbox.add_child(spacer)
 
 	var back_button := Button.new()
-	back_button.text = "← Назад"
+	back_button.text = "← Домой"
 	back_button.custom_minimum_size = Vector2(100, 40)
 	back_button.add_theme_font_size_override("font_size", 14)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -96,13 +94,10 @@ func _build_ui() -> void:
 	main_vbox.add_child(empty_label)
 
 func _refresh_cards() -> void:
-	print("ClubScreen: _refresh_cards() вызван")
-	
 	for child in cards_container.get_children():
 		child.queue_free()
 	
 	var all_cards: Array = ClubManager.club_cards
-	print("ClubScreen: игроков в клубе -> ", all_cards.size())
 	
 	if all_cards.is_empty():
 		empty_label.visible = true
@@ -119,11 +114,10 @@ func _refresh_cards() -> void:
 		card_ui.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		card_ui.gui_input.connect(_on_card_clicked.bind(card))
 		cards_container.add_child(card_ui)
-		print("ClubScreen: создана карточка для ", card.player_name)
 
 func _on_card_clicked(event: InputEvent, card: PlayerCard) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		print("ClubScreen: получен клик по игроку -> ", card.player_name)
+		print("ClubScreen: клик по игроку -> ", card.player_name)
 
 func _apply_button_style(button: Button, background_color: Color) -> void:
 	var normal := StyleBoxFlat.new()
@@ -143,7 +137,7 @@ func _apply_button_style(button: Button, background_color: Color) -> void:
 	button.add_theme_stylebox_override("pressed", pressed)
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file("res://PitchScreen.tscn")
+	get_tree().change_scene_to_file("res://HomeScreen.tscn")
 
 func _on_visibility_changed() -> void:
 	if visible:
