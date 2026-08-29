@@ -197,7 +197,7 @@ func _build_ui() -> void:
 	# НАЗАД
 	# ============================================================
 	back_button = Button.new()
-	back_button.text = "← Вернуться в игру"
+	back_button.text = "← Домой"
 	back_button.custom_minimum_size = Vector2(0, 40)
 	back_button.add_theme_font_size_override("font_size", 14)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -339,7 +339,7 @@ func _apply_button_style(button: Button, background_color: Color) -> void:
 	button.add_theme_stylebox_override("pressed", pressed)
 
 # ============================================================
-# ВОЗВРАТ В ИГРУ
+# ВОЗВРАТ НА ДОМАШНИЙ ЭКРАН
 # ============================================================
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file("res://PitchScreen.tscn")
+	get_tree().change_scene_to_file("res://HomeScreen.tscn")
