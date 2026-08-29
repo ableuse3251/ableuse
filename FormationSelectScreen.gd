@@ -206,32 +206,53 @@ func _create_ui() -> void:
 	top_glow.offset_bottom = 200.0
 	add_child(top_glow)
 
-	# Заголовок
+	# ============================================================
+	# ВЕРХНЯЯ ПАНЕЛЬ (НОВАЯ)
+	# ============================================================
+	var top_bar := HBoxContainer.new()
+	top_bar.custom_minimum_size = Vector2(0, 70)
+	top_bar.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	top_bar.offset_bottom = 70.0
+	top_bar.add_theme_constant_override("separation", 15)
+	add_child(top_bar)
+
+	var back_button := Button.new()
+	back_button.text = "← Домой"
+	back_button.custom_minimum_size = Vector2(100, 45)
+	back_button.add_theme_font_size_override("font_size", 16)
+	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	back_button.pressed.connect(_on_back_pressed)
+	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	top_bar.add_child(back_button)
+
 	var title_label := Label.new()
-	title_label.text = "ВЫБЕРИТЕ СХЕМУ"
+	title_label.text = "ВЫБОР СХЕМЫ"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 32)
-	title_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.95))
-	title_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	title_label.offset_bottom = 80.0
-	add_child(title_label)
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.add_theme_font_size_override("font_size", 22)
+	title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
+	top_bar.add_child(title_label)
 
-	# Подзаголовок
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(100, 45)
+	top_bar.add_child(spacer)
+
+	# Подзаголовок (сдвинут вниз)
 	var subtitle_label := Label.new()
 	subtitle_label.text = "4 случайные схемы из 17 доступных"
 	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle_label.add_theme_font_size_override("font_size", 14)
 	subtitle_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8, 0.8))
 	subtitle_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	subtitle_label.offset_top = 80.0
-	subtitle_label.offset_bottom = 105.0
+	subtitle_label.offset_top = 75.0
+	subtitle_label.offset_bottom = 100.0
 	add_child(subtitle_label)
 
-	# ScrollContainer
+	# ScrollContainer (сдвинут вниз)
 	var scroll_container := ScrollContainer.new()
 	scroll_container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scroll_container.offset_top = 110.0
+	scroll_container.offset_top = 105.0
 	scroll_container.offset_bottom = -20.0
 	scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll_container)
@@ -426,3 +447,31 @@ func _create_formation_card(formation: Dictionary) -> Control:
 	)
 
 	return card
+
+# ============================================================
+# НАВИГАЦИЯ
+# ============================================================
+
+func _on_back_pressed() -> void:
+	get_tree().change_scene_to_file("res://HomeScreen.tscn")
+
+# ============================================================
+# СТИЛЬ КНОПКИ
+# ============================================================
+
+func _apply_button_style(button: Button, background_color: Color) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = background_color
+	normal.corner_radius_top_left = 12
+	normal.corner_radius_top_right = 12
+	normal.corner_radius_bottom_left = 12
+	normal.corner_radius_bottom_right = 12
+	button.add_theme_stylebox_override("normal", normal)
+
+	var hover := normal.duplicate()
+	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
+	button.add_theme_stylebox_override("hover", hover)
+
+	var pressed := normal.duplicate()
+	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
+	button.add_theme_stylebox_override("pressed", pressed)
