@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cmlpnjys71ybk2"]
+
+[ext_resource type="Script" uid="uid://bpj40i1rrdvmk" path="res://CardUI.gd" id="1_huidv"]
+
+[node name="CardUI" type="Control" unique_id=949372586]
+custom_minimum_size = Vector2(180, 260)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_huidv")

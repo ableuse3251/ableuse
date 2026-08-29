@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cs8k86hg46x32"]
+
+[ext_resource type="Script" uid="uid://cbxo1uly3d4cb" path="res://DraftSelectScreen.gd" id="1_evqgn"]
+[ext_resource type="PackedScene" uid="uid://cmlpnjys71yb2" path="res://CardUI.tscn" id="2_xka64"]
+
+[node name="DraftSelectScreen" type="Control" unique_id=2004050567]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_evqgn")
+card_ui_scene = ExtResource("2_xka64")
+
+[node name="CardsContainer" type="HBoxContainer" parent="." unique_id=246921189]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1

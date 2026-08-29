@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bp7qf4klual6f"]
+
+[ext_resource type="Script" uid="uid://ln3gf7fm1ihy" path="res://PitchScreen.gd" id="1_bowfu"]
+[ext_resource type="PackedScene" uid="uid://cs8k86hg46x32" path="res://DraftSelectScreen.tscn" id="2_ii3ab"]
+[ext_resource type="PackedScene" path="res://FormationSelectScreen.tscn" id="2_l1kty"]
+[ext_resource type="PackedScene" uid="uid://dbj8quf6qwsfr" path="res://CardUI.tscn" id="3_pw7tp"]
+[ext_resource type="PackedScene" path="res://MatchSummaryScreen.tscn" id="4_kfoe1"]
+
+[node name="PitchScreen" type="Control" unique_id=1258959772]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bowfu")
+formation_select_scene = ExtResource("2_l1kty")
+draft_select_scene = ExtResource("2_ii3ab")
+card_ui_scene = ExtResource("3_pw7tp")
+summary_screen_scene = ExtResource("4_kfoe1")
+
+[node name="ChemLabel" type="Label" parent="." unique_id=92027664]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.4, 0.49803922, 0.9882353, 1)
+theme_override_font_sizes/font_size = 20
+text = "Сыгранность: 0 / 33"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=184422209]
+layer = 100
+
+[node name="StoreButton" type="Button" parent="CanvasLayer" unique_id=2112235935]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
+offset_bottom = 31.0
+grow_horizontal = 0
+text = "МАГАЗИН"
