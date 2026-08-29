@@ -1,7 +1,6 @@
 class_name PitchScreen
 extends Control
 
-
 # ============================================================
 # СЦЕНЫ
 # ============================================================
@@ -11,9 +10,7 @@ extends Control
 @export var card_ui_scene: PackedScene
 @export var summary_screen_scene: PackedScene
 
-
 @onready var chem_label: Label = $ChemLabel
-
 
 # ============================================================
 # ВЕРХНИЙ HUD
@@ -27,13 +24,11 @@ var top_layer: CanvasLayer
 var chemistry_panel: PanelContainer
 var chemistry_progress: ProgressBar
 
-
 # ============================================================
 # КНОПКА НОВОГО ДРАФТА
 # ============================================================
 
 var draft_button: Button
-
 
 # ============================================================
 # ПОЛЕ
@@ -44,7 +39,6 @@ var field_rect: Rect2 = Rect2()
 var field_margin_top: float = 78.0
 var field_margin_bottom: float = 20.0
 var field_margin_horizontal: float = 18.0
-
 
 # ============================================================
 # СХЕМА
@@ -58,7 +52,6 @@ var selected_slot_indices: Array[int] = []
 
 var position_buttons: Array[Button] = []
 
-
 # ============================================================
 # КАРТОЧКИ НА ПОЛЕ
 # ============================================================
@@ -66,7 +59,6 @@ var position_buttons: Array[Button] = []
 var field_card_nodes: Array[Node] = []
 
 var field_card_slot_indices: Array[int] = []
-
 
 # ============================================================
 # ТЕКУЩИЙ ДРАФТ
@@ -80,13 +72,11 @@ var draft_in_progress: bool = false
 
 var showing_saved_lineup: bool = false
 
-
 # ============================================================
 # СОСТОЯНИЕ
 # ============================================================
 
 var current_selected_slot: int = -1
-
 
 # ============================================================
 # READY
@@ -97,7 +87,6 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(
 		Control.PRESET_FULL_RECT
 	)
-
 
 	for node in get_children():
 
@@ -115,11 +104,9 @@ func _ready() -> void:
 
 			node.queue_free()
 
-
 	setup_top_ui_layer()
 
 	_update_field_rect()
-
 
 	if _has_saved_lineup():
 
@@ -129,9 +116,7 @@ func _ready() -> void:
 
 		start_new_draft()
 
-
 	queue_redraw()
-
 
 # ============================================================
 # RESIZE
@@ -149,9 +134,8 @@ func _notification(what: int) -> void:
 
 		queue_redraw()
 
-
 # ============================================================
-# РАЗМЕР ПОЛЯ
+# РАЗМЕР ПОЛЯ (ИСПРАВЛЕНО - FIFA ПРОПОРЦИИ)
 # ============================================================
 
 func _update_field_rect() -> void:
@@ -174,21 +158,22 @@ func _update_field_rect() -> void:
 		450.0
 	)
 
+	# Стандартное соотношение футбольного поля FIFA: 105м x 68м = 1.544
+	var field_aspect_ratio: float = 1.544
 
 	var field_width: float = available_width
+	var field_height: float = field_width * field_aspect_ratio
 
-	var field_height: float = min(
-		available_height,
-		field_width * 1.48
-	)
-
+	# Если поле не влезает по высоте, подстраиваем по высоте
+	if field_height > available_height:
+		field_height = available_height
+		field_width = field_height / field_aspect_ratio
 
 	var field_x: float = (
 		size.x - field_width
 	) * 0.5
 
 	var field_y: float = field_margin_top
-
 
 	if field_height < available_height:
 
@@ -200,14 +185,12 @@ func _update_field_rect() -> void:
 			) * 0.5
 		)
 
-
 	field_rect = Rect2(
 		field_x,
 		field_y,
 		field_width,
 		field_height
 	)
-
 
 # ============================================================
 # ПРОВЕРКА СОХРАНЁННОГО СОСТАВА
@@ -219,7 +202,6 @@ func _has_saved_lineup() -> bool:
 		return false
 
 	return ClubManager.starting_lineup.size() > 0
-
 
 # ============================================================
 # ВЕРХНИЙ HUD
@@ -233,7 +215,6 @@ func setup_top_ui_layer() -> void:
 
 	add_child(top_layer)
 
-
 	var top_panel := Panel.new()
 
 	top_panel.set_anchors_preset(
@@ -241,7 +222,6 @@ func setup_top_ui_layer() -> void:
 	)
 
 	top_panel.offset_bottom = 64.0
-
 
 	var top_style := StyleBoxFlat.new()
 
@@ -261,14 +241,12 @@ func setup_top_ui_layer() -> void:
 		0.08
 	)
 
-
 	top_panel.add_theme_stylebox_override(
 		"panel",
 		top_style
 	)
 
 	top_layer.add_child(top_panel)
-
 
 	var margin := MarginContainer.new()
 
@@ -298,7 +276,6 @@ func setup_top_ui_layer() -> void:
 
 	top_panel.add_child(margin)
 
-
 	var top_bar := HBoxContainer.new()
 
 	top_bar.add_theme_constant_override(
@@ -307,7 +284,6 @@ func setup_top_ui_layer() -> void:
 	)
 
 	margin.add_child(top_bar)
-
 
 	# ========================================================
 	# МОЙ КЛУБ
@@ -348,7 +324,6 @@ func setup_top_ui_layer() -> void:
 		club_button
 	)
 
-
 	# ========================================================
 	# МАГАЗИН
 	# ========================================================
@@ -388,7 +363,6 @@ func setup_top_ui_layer() -> void:
 		store_button
 	)
 
-
 	# ========================================================
 	# РАСПОРКА
 	# ========================================================
@@ -400,7 +374,6 @@ func setup_top_ui_layer() -> void:
 	)
 
 	top_bar.add_child(spacer)
-
 
 	# ========================================================
 	# СЫГРАННОСТЬ
@@ -423,7 +396,6 @@ func setup_top_ui_layer() -> void:
 	)
 
 	top_bar.add_child(chemistry_box)
-
 
 	chem_label = Label.new()
 
@@ -451,7 +423,6 @@ func setup_top_ui_layer() -> void:
 		chem_label
 	)
 
-
 	chemistry_progress = ProgressBar.new()
 
 	chemistry_progress.min_value = 0
@@ -468,7 +439,6 @@ func setup_top_ui_layer() -> void:
 	chemistry_box.add_child(
 		chemistry_progress
 	)
-
 
 	# ========================================================
 	# МОНЕТЫ
@@ -512,591 +482,133 @@ func setup_top_ui_layer() -> void:
 		coins_label
 	)
 
-
 # ============================================================
-# РИСОВАНИЕ ПОЛЯ
+# РИСОВАНИЕ ПОЛЯ (ИСПРАВЛЕНО - ПРАВИЛЬНЫЕ ПРОПОРЦИИ)
 # ============================================================
 
 func _draw() -> void:
 
-	# ========================================================
-	# ФОН
-	# ========================================================
-
+	# 1. Фон экрана
 	draw_rect(
-		Rect2(
-			Vector2.ZERO,
-			size
-		),
-		Color(
-			0.018,
-			0.025,
-			0.04,
-			1.0
-		),
+		Rect2(Vector2.ZERO, size),
+		Color(0.015, 0.020, 0.030, 1.0),
 		true
 	)
-
-
-	# ========================================================
-	# МЯГКОЕ СВЕЧЕНИЕ ЗА ПОЛЕМ
-	# ========================================================
-
-	var glow_center := Vector2(
-		size.x * 0.5,
-		field_rect.position.y
-		+ field_rect.size.y * 0.42
-	)
-
-	draw_circle(
-		glow_center,
-		min(
-			size.x * 0.58,
-			480.0
-		),
-		Color(
-			0.035,
-			0.16,
-			0.075,
-			0.16
-		)
-	)
-
 
 	var field := field_rect
+	
+	# Базовый размер для всех расчётов — ширина и высота поля
+	var field_width := field.size.x
+	var field_height := field.size.y
+	
+	# Цвет и толщина линий
+	var line_color := Color(0.95, 0.98, 1.0, 0.90)
+	var line_width := 2.0
+	var thin_line_width := 1.5
 
+	# 2. Мягкое свечение за полем
+	var glow_center := Vector2(size.x * 0.5, field.position.y + field.size.y * 0.42)
+	draw_circle(glow_center, min(size.x * 0.58, 480.0), Color(0.035, 0.16, 0.075, 0.16))
 
-	# ========================================================
-	# ТЕНЬ
-	# ========================================================
-
+	# 3. Тень поля
 	draw_style_box(
 		_create_field_shadow_style(),
-		Rect2(
-			field.position + Vector2(0, 5),
-			field.size
-		)
+		Rect2(field.position + Vector2(0, 6), field.size)
 	)
 
+	# 4. Основа газона
+	draw_rect(field, Color(0.045, 0.245, 0.105, 1.0), true)
 
-	# ========================================================
-	# ОСНОВА ГАЗОНА
-	# ========================================================
-
-	draw_rect(
-		field,
-		Color(
-			0.045,
-			0.245,
-			0.105,
-			1.0
-		),
-		true
-	)
-
-
-	# ========================================================
-	# ПОЛОСЫ ГАЗОНА
-	# ========================================================
-
-	var stripe_height: float = (
-		field.size.y / 14.0
-	)
-
-
-	for i in range(14):
-
-		var stripe_color := Color(
-			0.060,
-			0.285,
-			0.125,
-			1.0
-		)
-
-		if i % 2 == 1:
-
-			stripe_color = Color(
-				0.043,
-				0.225,
-				0.095,
-				1.0
-			)
-
-
+	# 5. Полосы газона (10 широких полос)
+	var stripe_count := 10
+	var stripe_height := field_height / float(stripe_count)
+	for i in range(stripe_count):
+		var stripe_color := Color(0.055, 0.265, 0.115, 1.0) if i % 2 == 0 else Color(0.040, 0.220, 0.090, 1.0)
 		draw_rect(
-			Rect2(
-				field.position.x,
-				field.position.y
-				+ stripe_height * i,
-				field.size.x,
-				stripe_height + 1.0
-			),
+			Rect2(field.position.x, field.position.y + stripe_height * i, field_width, stripe_height + 1.0),
 			stripe_color,
 			true
 		)
 
-
-	# ========================================================
-	# ЛЁГКИЙ ВНУТРЕННИЙ ГРАДИЕНТ
-	# ========================================================
-
-	draw_rect(
-		Rect2(
-			field.position.x,
-			field.position.y,
-			field.size.x,
-			field.size.y
-		),
-		Color(
-			0.02,
-			0.08,
-			0.035,
-			0.10
-		),
-		true
-	)
-
-
-	# ========================================================
-	# ВНЕШНЯЯ РАМКА
-	# ========================================================
-
-	draw_rect(
-		field,
-		Color(
-			0.90,
-			1.0,
-			0.92,
-			0.58
-		),
-		false,
-		2.0
-	)
-
-
-	# ========================================================
-	# ЦЕНТРАЛЬНАЯ ЛИНИЯ
-	# ========================================================
-
-	var center_y: float = (
-		field.position.y
-		+ field.size.y * 0.5
-	)
-
-
-	draw_line(
-		Vector2(
-			field.position.x,
-			center_y
-		),
-		Vector2(
-			field.end.x,
-			center_y
-		),
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.55
-		),
-		1.6
-	)
-
-
-	# ========================================================
-	# ЦЕНТРАЛЬНЫЙ КРУГ
-	# ========================================================
-
-	var center := Vector2(
-		field.get_center().x,
-		center_y
-	)
-
-
-	# Сделали его заметно меньше,
-	# чтобы он не перетягивал внимание на себя.
-
-	var center_radius: float = min(
-		field.size.x * 0.135,
-		54.0
-	)
-
-
-	draw_arc(
-		center,
-		center_radius,
-		0.0,
-		TAU,
-		72,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.52
-		),
-		1.6
-	)
-
-
-	# Центральная точка теперь совсем небольшая.
-
-	draw_circle(
-		center,
-		2.2,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.60
-		)
-	)
-
-
-	# ========================================================
-	# ШТРАФНЫЕ ПЛОЩАДКИ
-	# ========================================================
-
-	var penalty_box_width: float = (
-		field.size.x * 0.56
-	)
-
-	var penalty_box_height: float = (
-		field.size.y * 0.145
-	)
-
-
-	var penalty_box_x: float = (
-		field.position.x
-		+ (
-			field.size.x
-			- penalty_box_width
-		) * 0.5
-	)
-
-
-	var top_penalty_box := Rect2(
-		penalty_box_x,
-		field.position.y,
-		penalty_box_width,
-		penalty_box_height
-	)
-
-
-	var bottom_penalty_box := Rect2(
-		penalty_box_x,
-		field.end.y - penalty_box_height,
-		penalty_box_width,
-		penalty_box_height
-	)
-
-
-	var line_color := Color(
-		0.95,
-		1.0,
-		0.96,
-		0.52
-	)
-
-
-	draw_rect(
-		top_penalty_box,
-		line_color,
-		false,
-		1.7
-	)
-
-
-	draw_rect(
-		bottom_penalty_box,
-		line_color,
-		false,
-		1.7
-	)
-
-
-	# ========================================================
-	# ВРАТАРСКИЕ ПЛОЩАДКИ
-	# ========================================================
-
-	var goal_box_width: float = (
-		field.size.x * 0.27
-	)
-
-	var goal_box_height: float = (
-		field.size.y * 0.052
-	)
-
-
-	var goal_box_x: float = (
-		field.position.x
-		+ (
-			field.size.x
-			- goal_box_width
-		) * 0.5
-	)
-
-
-	var top_goal_box := Rect2(
-		goal_box_x,
-		field.position.y,
-		goal_box_width,
-		goal_box_height
-	)
-
-
-	var bottom_goal_box := Rect2(
-		goal_box_x,
-		field.end.y - goal_box_height,
-		goal_box_width,
-		goal_box_height
-	)
-
-
-	draw_rect(
-		top_goal_box,
-		line_color,
-		false,
-		1.7
-	)
-
-
-	draw_rect(
-		bottom_goal_box,
-		line_color,
-		false,
-		1.7
-	)
-
-
-	# ========================================================
-	# ВРАТА
-	# ========================================================
-
-	var goal_width: float = (
-		field.size.x * 0.17
-	)
-
-	var goal_depth: float = (
-		field.size.y * 0.018
-	)
-
-
-	var goal_x: float = (
-		field.position.x
-		+ (
-			field.size.x
-			- goal_width
-		) * 0.5
-	)
-
-
-	var top_goal := Rect2(
-		goal_x,
-		field.position.y - goal_depth,
-		goal_width,
-		goal_depth
-	)
-
-
-	var bottom_goal := Rect2(
-		goal_x,
-		field.end.y,
-		goal_width,
-		goal_depth
-	)
-
-
-	draw_rect(
-		top_goal,
-		Color(
-			0.88,
-			0.95,
-			0.90,
-			0.38
-		),
-		true
-	)
-
-
-	draw_rect(
-		bottom_goal,
-		Color(
-			0.88,
-			0.95,
-			0.90,
-			0.38
-		),
-		true
-	)
-
-
-	# ========================================================
-	# ТОЧКИ ПЕНАЛЬТИ
-	# ========================================================
-
-	var penalty_spot_offset: float = (
-		field.size.y * 0.105
-	)
-
-
-	draw_circle(
-		Vector2(
-			field.get_center().x,
-			field.position.y
-			+ penalty_spot_offset
-		),
-		2.3,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.60
-		)
-	)
-
-
-	draw_circle(
-		Vector2(
-			field.get_center().x,
-			field.end.y
-			- penalty_spot_offset
-		),
-		2.3,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.60
-		)
-	)
-
-
-	# ========================================================
-	# ДУГИ ШТРАФНОЙ
-	#
-	# Теперь они меньше и визуально отделены
-	# от центрального круга.
-	# ========================================================
-
-	var penalty_arc_radius: float = (
-		penalty_box_width * 0.255
-	)
-
-
-	draw_arc(
-		Vector2(
-			field.get_center().x,
-			field.position.y
-			+ penalty_box_height
-		),
-		penalty_arc_radius,
-		0.0,
-		PI,
-		40,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.42
-		),
-		1.5
-	)
-
-
-	draw_arc(
-		Vector2(
-			field.get_center().x,
-			field.end.y
-			- penalty_box_height
-		),
-		penalty_arc_radius,
-		PI,
-		TAU,
-		40,
-		Color(
-			0.95,
-			1.0,
-			0.96,
-			0.42
-		),
-		1.5
-	)
-
-
-	# ========================================================
-	# УГЛОВЫЕ ДУГИ
-	# ========================================================
-
-	var corner_radius: float = min(
-		field.size.x,
-		field.size.y
-	) * 0.025
-
-
-	var corner_color := Color(
-		0.95,
-		1.0,
-		0.96,
-		0.42
-	)
-
-
+	# 6. Лёгкая виньетка по краям
+	var vignette_strength := 0.12
+	var edge := field_width * 0.05
+	draw_rect(Rect2(field.position.x, field.position.y, field_width, edge), Color(0, 0, 0, vignette_strength), true)
+	draw_rect(Rect2(field.position.x, field.end.y - edge, field_width, edge), Color(0, 0, 0, vignette_strength), true)
+	draw_rect(Rect2(field.position.x, field.position.y, edge, field_height), Color(0, 0, 0, vignette_strength), true)
+	draw_rect(Rect2(field.end.x - edge, field.position.y, edge, field_height), Color(0, 0, 0, vignette_strength), true)
+
+	# 7. Внешняя рамка
+	draw_rect(field, line_color, false, line_width)
+
+	# 8. Центральная линия
+	var center_y := field.position.y + field_height * 0.5
+	draw_line(Vector2(field.position.x, center_y), Vector2(field.end.x, center_y), line_color, line_width)
+
+	# 9. Центральный круг (радиус 9.15м при ширине 68м = 0.1346 от ширины)
+	var center := Vector2(field.position.x + field_width * 0.5, center_y)
+	var center_radius := field_width * 0.1346
+	draw_arc(center, center_radius, 0.0, TAU, 64, line_color, line_width)
+	draw_circle(center, 3.0, line_color)
+
+	# 10. Штрафные площади (ширина 40.32м = 0.593 от ширины поля, глубина 16.5м = 0.157 от длины)
+	var penalty_box_width := field_width * 0.593
+	var penalty_box_height := field_height * 0.157
+	var penalty_box_x := field.position.x + (field_width - penalty_box_width) * 0.5
+	
+	var top_penalty_box := Rect2(penalty_box_x, field.position.y, penalty_box_width, penalty_box_height)
+	var bottom_penalty_box := Rect2(penalty_box_x, field.end.y - penalty_box_height, penalty_box_width, penalty_box_height)
+	
+	draw_rect(top_penalty_box, line_color, false, line_width)
+	draw_rect(bottom_penalty_box, line_color, false, line_width)
+
+	# 11. Вратарские площади (ширина 18.32м = 0.269 от ширины, глубина 5.5м = 0.052 от длины)
+	var goal_box_width := field_width * 0.269
+	var goal_box_height := field_height * 0.052
+	var goal_box_x := field.position.x + (field_width - goal_box_width) * 0.5
+	
+	var top_goal_box := Rect2(goal_box_x, field.position.y, goal_box_width, goal_box_height)
+	var bottom_goal_box := Rect2(goal_box_x, field.end.y - goal_box_height, goal_box_width, goal_box_height)
+	
+	draw_rect(top_goal_box, line_color, false, line_width)
+	draw_rect(bottom_goal_box, line_color, false, line_width)
+
+	# 12. Врата (визуальные)
+	var goal_width := field_width * 0.108
+	var goal_depth := field_height * 0.02
+	var goal_x := field.position.x + (field_width - goal_width) * 0.5
+	
+	var top_goal := Rect2(goal_x, field.position.y - goal_depth, goal_width, goal_depth)
+	var bottom_goal := Rect2(goal_x, field.end.y, goal_width, goal_depth)
+	
+	draw_rect(top_goal, Color(0.90, 0.95, 0.92, 0.40), true)
+	draw_rect(bottom_goal, Color(0.90, 0.95, 0.92, 0.40), true)
+
+	# 13. Точки пенальти (11м от линии ворот = 0.105 от длины поля)
+	var penalty_spot_offset := field_height * 0.105
+	var top_penalty_spot := Vector2(field.position.x + field_width * 0.5, field.position.y + penalty_spot_offset)
+	var bottom_penalty_spot := Vector2(field.position.x + field_width * 0.5, field.end.y - penalty_spot_offset)
+	
+	draw_circle(top_penalty_spot, 3.0, line_color)
+	draw_circle(bottom_penalty_spot, 3.0, line_color)
+
+	# 14. Дуги штрафной (радиус 9.15м = 0.1346 от ширины)
+	var penalty_arc_radius := field_width * 0.1346
+	# Верхняя дуга (от точки пенальти, направлена к центру)
+	draw_arc(top_penalty_spot, penalty_arc_radius, 0.0, PI, 40, line_color, thin_line_width)
+	# Нижняя дуга (от точки пенальти, направлена к центру)
+	draw_arc(bottom_penalty_spot, penalty_arc_radius, PI, TAU, 40, line_color, thin_line_width)
+
+	# 15. Угловые дуги (радиус 1м = 0.0147 от ширины)
+	var corner_radius := field_width * 0.0147
 	# Верхний левый
-
-	draw_arc(
-		field.position,
-		corner_radius,
-		0.0,
-		PI * 0.5,
-		20,
-		corner_color,
-		1.5
-	)
-
-
+	draw_arc(field.position, corner_radius, 0.0, PI * 0.5, 20, line_color, thin_line_width)
 	# Верхний правый
-
-	draw_arc(
-		Vector2(
-			field.end.x,
-			field.position.y
-		),
-		corner_radius,
-		PI * 0.5,
-		PI,
-		20,
-		corner_color,
-		1.5
-	)
-
-
+	draw_arc(Vector2(field.end.x, field.position.y), corner_radius, PI * 0.5, PI, 20, line_color, thin_line_width)
 	# Нижний левый
-
-	draw_arc(
-		Vector2(
-			field.position.x,
-			field.end.y
-		),
-		corner_radius,
-		PI * 1.5,
-		TAU,
-		20,
-		corner_color,
-		1.5
-	)
-
-
+	draw_arc(Vector2(field.position.x, field.end.y), corner_radius, PI * 1.5, TAU, 20, line_color, thin_line_width)
 	# Нижний правый
-
-	draw_arc(
-		field.end,
-		corner_radius,
-		PI,
-		PI * 1.5,
-		20,
-		corner_color,
-		1.5
-	)
+	draw_arc(field.end, corner_radius, PI, PI * 1.5, 20, line_color, thin_line_width)
 
 
 # ============================================================
@@ -1107,12 +619,7 @@ func _create_field_shadow_style() -> StyleBoxFlat:
 
 	var style := StyleBoxFlat.new()
 
-	style.bg_color = Color(
-		0,
-		0,
-		0,
-		0.38
-	)
+	style.bg_color = Color(0, 0, 0, 0.38)
 
 	style.corner_radius_top_left = 16
 	style.corner_radius_top_right = 16
@@ -1120,7 +627,6 @@ func _create_field_shadow_style() -> StyleBoxFlat:
 	style.corner_radius_bottom_right = 16
 
 	return style
-
 
 # ============================================================
 # НОВЫЙ ДРАФТ
@@ -1131,16 +637,13 @@ func start_new_draft() -> void:
 	if draft_in_progress:
 		return
 
-
 	draft_in_progress = true
 	showing_saved_lineup = false
 	selecting_position = false
 	current_selected_slot = -1
 
-
 	_clear_field_cards()
 	_clear_position_buttons()
-
 
 	if is_instance_valid(current_draft_screen):
 
@@ -1148,20 +651,15 @@ func start_new_draft() -> void:
 
 		current_draft_screen = null
 
-
 	PlayerData.clear_draft()
-
 
 	selected_formation.clear()
 	formation_slots.clear()
 	selected_slot_indices.clear()
 
-
 	update_chemistry_ui()
 
-
 	open_formation_selection()
-
 
 # ============================================================
 # ВЫБОР СХЕМЫ
@@ -1179,16 +677,13 @@ func open_formation_selection() -> void:
 
 		return
 
-
 	var formation_screen := (
 		formation_select_scene.instantiate()
 	)
 
-
 	add_child(
 		formation_screen
 	)
-
 
 	if formation_screen.has_signal(
 		"formation_selected"
@@ -1204,7 +699,6 @@ func open_formation_selection() -> void:
 			"FormationSelectScreen не имеет сигнала formation_selected."
 		)
 
-
 # ============================================================
 # СХЕМА ВЫБРАНА
 # ============================================================
@@ -1218,7 +712,6 @@ func _on_formation_selected(
 	formation_slots.clear()
 	selected_slot_indices.clear()
 
-
 	for slot in selected_formation.get(
 		"slots",
 		[]
@@ -1229,7 +722,6 @@ func _on_formation_selected(
 			formation_slots.append(
 				slot.duplicate(true)
 			)
-
 
 	for child in get_children():
 
@@ -1242,7 +734,6 @@ func _on_formation_selected(
 
 			child.queue_free()
 
-
 	_create_position_buttons()
 
 	selecting_position = true
@@ -1253,7 +744,6 @@ func _on_formation_selected(
 
 	queue_redraw()
 
-
 # ============================================================
 # КНОПКИ ПОЗИЦИЙ
 # ============================================================
@@ -1261,7 +751,6 @@ func _on_formation_selected(
 func _create_position_buttons() -> void:
 
 	_clear_position_buttons()
-
 
 	for i in range(
 		formation_slots.size()
@@ -1280,35 +769,28 @@ func _create_position_buttons() -> void:
 			)
 		)
 
-
 		button.custom_minimum_size = Vector2(
 			74,
 			48
 		)
 
-
 		button.mouse_default_cursor_shape = (
 			Control.CURSOR_POINTING_HAND
 		)
 
-
 		button.focus_mode = Control.FOCUS_NONE
-
 
 		button.add_theme_font_size_override(
 			"font_size",
 			12
 		)
 
-
 		_apply_position_button_style(
 			button,
 			false
 		)
 
-
 		var slot_index := i
-
 
 		button.pressed.connect(
 			func():
@@ -1317,19 +799,15 @@ func _create_position_buttons() -> void:
 				)
 		)
 
-
 		add_child(
 			button
 		)
-
 
 		position_buttons.append(
 			button
 		)
 
-
 	_reposition_position_buttons()
-
 
 # ============================================================
 # ПОЗИЦИЯ НАЖАТА
@@ -1342,10 +820,8 @@ func _on_position_pressed(
 	if slot_index < 0:
 		return
 
-
 	if slot_index >= formation_slots.size():
 		return
-
 
 	if selected_slot_indices.has(
 		slot_index
@@ -1353,9 +829,7 @@ func _on_position_pressed(
 
 		return
 
-
 	current_selected_slot = slot_index
-
 
 	for i in range(
 		position_buttons.size()
@@ -1375,11 +849,9 @@ func _on_position_pressed(
 				false
 			)
 
-
 	open_player_choice_for_slot(
 		slot_index
 	)
-
 
 # ============================================================
 # ВЫБОР ИГРОКА ДЛЯ ПОЗИЦИИ
@@ -1397,14 +869,11 @@ func open_player_choice_for_slot(
 
 		return
 
-
 	if slot_index < 0:
 		return
 
-
 	if slot_index >= formation_slots.size():
 		return
-
 
 	var actual_position: String = str(
 		formation_slots[slot_index].get(
@@ -1413,20 +882,17 @@ func open_player_choice_for_slot(
 		)
 	)
 
-
 	var database_position := (
 		_convert_position_to_database_category(
 			actual_position
 		)
 	)
 
-
 	var choices: Array[PlayerCard] = (
 		CardDatabase.generate_draft_choice(
 			database_position
 		)
 	)
-
 
 	if choices.is_empty():
 
@@ -1439,11 +905,9 @@ func open_player_choice_for_slot(
 
 		return
 
-
 	_set_position_buttons_enabled(
 		false
 	)
-
 
 	if is_instance_valid(current_draft_screen):
 
@@ -1451,16 +915,13 @@ func open_player_choice_for_slot(
 
 		current_draft_screen = null
 
-
 	current_draft_screen = (
 		draft_select_scene.instantiate()
 	)
 
-
 	add_child(
 		current_draft_screen
 	)
-
 
 	if current_draft_screen.has_signal(
 		"player_selected_on_screen"
@@ -1476,7 +937,6 @@ func open_player_choice_for_slot(
 			"DraftSelectScreen не имеет сигнала player_selected_on_screen."
 		)
 
-
 	if current_draft_screen.has_method(
 		"start_choice_for_position"
 	):
@@ -1485,7 +945,6 @@ func open_player_choice_for_slot(
 			actual_position,
 			choices
 		)
-
 
 # ============================================================
 # ПЕРЕВОД ПОЗИЦИИ В КАТЕГОРИЮ БАЗЫ
@@ -1496,7 +955,6 @@ func _convert_position_to_database_category(
 ) -> String:
 
 	var normalized := position.to_upper().strip_edges()
-
 
 	match normalized:
 
@@ -1515,7 +973,6 @@ func _convert_position_to_database_category(
 		_:
 			return normalized
 
-
 # ============================================================
 # ИГРОК ВЫБРАН
 # ============================================================
@@ -1532,7 +989,6 @@ func _on_player_selected(
 
 		current_draft_screen = null
 
-
 	if not selected_card is PlayerCard:
 
 		push_error(
@@ -1545,9 +1001,7 @@ func _on_player_selected(
 
 		return
 
-
 	var player_card: PlayerCard = selected_card
-
 
 	if current_selected_slot < 0:
 
@@ -1561,19 +1015,15 @@ func _on_player_selected(
 
 		return
 
-
 	var selected_slot := current_selected_slot
-
 
 	PlayerData.current_draft_team.append(
 		player_card
 	)
 
-
 	selected_slot_indices.append(
 		selected_slot
 	)
-
 
 	if card_ui_scene:
 
@@ -1581,30 +1031,25 @@ func _on_player_selected(
 			card_ui_scene.instantiate()
 		)
 
-
 		if mini_card_node:
 
 			add_child(
 				mini_card_node
 			)
 
-
 			field_card_nodes.append(
 				mini_card_node
 			)
 
-
 			field_card_slot_indices.append(
 				selected_slot
 			)
-
 
 			if mini_card_node.has_method(
 				"set_compact_mode"
 			):
 
 				mini_card_node.set_compact_mode()
-
 
 			if mini_card_node.has_method(
 				"setup"
@@ -1614,7 +1059,6 @@ func _on_player_selected(
 					player_card
 				)
 
-
 			_position_card_node(
 				mini_card_node,
 				_get_formation_field_position(
@@ -1622,17 +1066,13 @@ func _on_player_selected(
 				)
 			)
 
-
 	_mark_position_as_filled(
 		selected_slot
 	)
 
-
 	current_selected_slot = -1
 
-
 	update_chemistry_ui()
-
 
 	if selected_slot_indices.size() >= formation_slots.size():
 
@@ -1646,7 +1086,6 @@ func _on_player_selected(
 
 		selecting_position = true
 
-
 # ============================================================
 # ПОМЕТИТЬ ПОЗИЦИЮ КАК ЗАПОЛНЕННУЮ
 # ============================================================
@@ -1658,15 +1097,12 @@ func _mark_position_as_filled(
 	if slot_index < 0:
 		return
 
-
 	if slot_index >= position_buttons.size():
 		return
-
 
 	var button := position_buttons[
 		slot_index
 	]
-
 
 	button.text = "✓ " + str(
 		formation_slots[
@@ -1677,16 +1113,13 @@ func _mark_position_as_filled(
 		)
 	)
 
-
 	button.disabled = true
-
 
 	_apply_position_button_style(
 		button,
 		false,
 		true
 	)
-
 
 # ============================================================
 # АКТИВНОСТЬ КНОПОК ПОЗИЦИЙ
@@ -1702,13 +1135,11 @@ func _set_position_buttons_enabled(
 
 		var button := position_buttons[i]
 
-
 		if not is_instance_valid(
 			button
 		):
 
 			continue
-
 
 		if selected_slot_indices.has(
 			i
@@ -1719,7 +1150,6 @@ func _set_position_buttons_enabled(
 		else:
 
 			button.disabled = not enabled
-
 
 # ============================================================
 # ПОЗИЦИЯ ИГРОКА НА ПОЛЕ
@@ -1732,15 +1162,12 @@ func _get_formation_field_position(
 	if slot_index < 0:
 		return field_rect.get_center()
 
-
 	if slot_index >= formation_slots.size():
 		return field_rect.get_center()
-
 
 	var slot: Dictionary = (
 		formation_slots[slot_index]
 	)
-
 
 	var x: float = float(
 		slot.get(
@@ -1749,7 +1176,6 @@ func _get_formation_field_position(
 		)
 	)
 
-
 	var y: float = float(
 		slot.get(
 			"y",
@@ -1757,14 +1183,12 @@ func _get_formation_field_position(
 		)
 	)
 
-
 	return Vector2(
 		field_rect.position.x
 		+ field_rect.size.x * x,
 		field_rect.position.y
 		+ field_rect.size.y * y
 	)
-
 
 # ============================================================
 # ПОЗИЦИЯ КНОПКИ НА ПОЛЕ
@@ -1780,15 +1204,12 @@ func _get_position_button_position(
 		)
 	)
 
-
 	var button_size := Vector2(
 		74,
 		48
 	)
 
-
 	return center - button_size * 0.5
-
 
 # ============================================================
 # РАЗМЕЩЕНИЕ КНОПОК
@@ -1799,13 +1220,11 @@ func _reposition_position_buttons() -> void:
 	if position_buttons.is_empty():
 		return
 
-
 	for i in range(
 		position_buttons.size()
 	):
 
 		var button := position_buttons[i]
-
 
 		if not is_instance_valid(
 			button
@@ -1813,13 +1232,11 @@ func _reposition_position_buttons() -> void:
 
 			continue
 
-
 		button.position = (
 			_get_position_button_position(
 				i
 			)
 		)
-
 
 # ============================================================
 # СТИЛЬ КНОПКИ ПОЗИЦИИ
@@ -1832,7 +1249,6 @@ func _apply_position_button_style(
 ) -> void:
 
 	var normal := StyleBoxFlat.new()
-
 
 	if filled:
 
@@ -1861,18 +1277,15 @@ func _apply_position_button_style(
 			0.94
 		)
 
-
 	normal.corner_radius_top_left = 14
 	normal.corner_radius_top_right = 14
 	normal.corner_radius_bottom_left = 14
 	normal.corner_radius_bottom_right = 14
 
-
 	normal.border_width_left = 2
 	normal.border_width_right = 2
 	normal.border_width_top = 2
 	normal.border_width_bottom = 2
-
 
 	if filled:
 
@@ -1901,15 +1314,12 @@ func _apply_position_button_style(
 			0.25
 		)
 
-
 	button.add_theme_stylebox_override(
 		"normal",
 		normal
 	)
 
-
 	var hover := normal.duplicate()
-
 
 	if not filled:
 
@@ -1920,15 +1330,12 @@ func _apply_position_button_style(
 			1.0
 		)
 
-
 	button.add_theme_stylebox_override(
 		"hover",
 		hover
 	)
 
-
 	var pressed := normal.duplicate()
-
 
 	if not filled:
 
@@ -1939,12 +1346,10 @@ func _apply_position_button_style(
 			1.0
 		)
 
-
 	button.add_theme_stylebox_override(
 		"pressed",
 		pressed
 	)
-
 
 	button.add_theme_color_override(
 		"font_color",
@@ -1965,7 +1370,6 @@ func _apply_position_button_style(
 		)
 	)
 
-
 # ============================================================
 # КАРТОЧКА ИГРОКА
 # ============================================================
@@ -1978,32 +1382,26 @@ func _create_field_card(
 	if card_ui_scene == null:
 		return
 
-
 	var mini_card_node := (
 		card_ui_scene.instantiate()
 	)
 
-
 	if mini_card_node == null:
 		return
-
 
 	add_child(
 		mini_card_node
 	)
 
-
 	field_card_nodes.append(
 		mini_card_node
 	)
-
 
 	if mini_card_node.has_method(
 		"set_compact_mode"
 	):
 
 		mini_card_node.set_compact_mode()
-
 
 	if mini_card_node.has_method(
 		"setup"
@@ -2013,12 +1411,10 @@ func _create_field_card(
 			card
 		)
 
-
 	_position_card_node(
 		mini_card_node,
 		field_position
 	)
-
 
 # ============================================================
 # ПОЗИЦИОНИРОВАНИЕ КАРТОЧКИ
@@ -2032,26 +1428,21 @@ func _position_card_node(
 	if not card_node is Control:
 		return
 
-
 	var control := card_node as Control
-
 
 	var target_width: float = min(
 		field_rect.size.x * 0.19,
 		125.0
 	)
 
-
 	var scale_factor: float = (
 		target_width / 180.0
 	)
-
 
 	control.scale = Vector2(
 		scale_factor,
 		scale_factor
 	)
-
 
 	control.position = (
 		field_position
@@ -2060,7 +1451,6 @@ func _position_card_node(
 			130.0 * scale_factor
 		)
 	)
-
 
 # ============================================================
 # ПЕРЕПОЗИЦИОНИРОВАНИЕ КАРТОЧЕК
@@ -2071,13 +1461,11 @@ func _reposition_field_cards() -> void:
 	if field_card_nodes.is_empty():
 		return
 
-
 	for i in range(
 		field_card_nodes.size()
 	):
 
 		var node := field_card_nodes[i]
-
 
 		if not is_instance_valid(
 			node
@@ -2085,15 +1473,12 @@ func _reposition_field_cards() -> void:
 
 			continue
 
-
 		if i >= field_card_slot_indices.size():
 			continue
-
 
 		var slot_index := (
 			field_card_slot_indices[i]
 		)
-
 
 		_position_card_node(
 			node,
@@ -2101,7 +1486,6 @@ func _reposition_field_cards() -> void:
 				slot_index
 			)
 		)
-
 
 # ============================================================
 # ОЧИСТКА КАРТОЧЕК
@@ -2117,10 +1501,8 @@ func _clear_field_cards() -> void:
 
 			node.queue_free()
 
-
 	field_card_nodes.clear()
 	field_card_slot_indices.clear()
-
 
 # ============================================================
 # ОЧИСТКА КНОПОК ПОЗИЦИЙ
@@ -2136,9 +1518,7 @@ func _clear_position_buttons() -> void:
 
 			button.queue_free()
 
-
 	position_buttons.clear()
-
 
 # ============================================================
 # СОХРАНЁННЫЙ СОСТАВ
@@ -2150,28 +1530,21 @@ func show_saved_lineup() -> void:
 	draft_in_progress = false
 	selecting_position = false
 
-
 	_clear_field_cards()
 	_clear_position_buttons()
 
-
 	_update_chemistry_from_lineup()
 
-
 	_create_draft_button()
-
 
 	var lineup: Array[PlayerCard] = (
 		ClubManager.get_starting_lineup()
 	)
 
-
 	if lineup.is_empty():
 		return
 
-
 	formation_slots.clear()
-
 
 	var default_slots: Array[Dictionary] = [
 
@@ -2191,16 +1564,13 @@ func show_saved_lineup() -> void:
 		{"position": "FWD", "x": 0.78, "y": 0.27}
 	]
 
-
 	for slot in default_slots:
 
 		formation_slots.append(
 			slot
 		)
 
-
 	selected_slot_indices.clear()
-
 
 	for i in range(
 		min(
@@ -2211,17 +1581,14 @@ func show_saved_lineup() -> void:
 
 		var card: PlayerCard = lineup[i]
 
-
 		selected_slot_indices.append(
 			i
 		)
-
 
 		_create_field_card(
 			card,
 			_get_formation_field_position(i)
 		)
-
 
 # ============================================================
 # СЫГРАННОСТЬ СОХРАНЁННОГО СОСТАВА
@@ -2235,14 +1602,11 @@ func _update_chemistry_from_lineup() -> void:
 
 		return
 
-
 	var lineup: Array[PlayerCard] = (
 		ClubManager.get_starting_lineup()
 	)
 
-
 	var total_chem: int = 0
-
 
 	if lineup.size() > 0:
 
@@ -2252,11 +1616,9 @@ func _update_chemistry_from_lineup() -> void:
 			)
 		)
 
-
 	_update_chemistry_display(
 		total_chem
 	)
-
 
 # ============================================================
 # СЫГРАННОСТЬ
@@ -2270,11 +1632,9 @@ func update_chemistry_ui() -> void:
 		)
 	)
 
-
 	_update_chemistry_display(
 		total_chem
 	)
-
 
 # ============================================================
 # UI СЫГРАННОСТИ
@@ -2287,16 +1647,14 @@ func _update_chemistry_display(
 	if chem_label:
 
 		chem_label.text = (
-			"⚡  Сыгранность  "
+			"  Сыгранность  "
 			+ str(value)
 			+ " / 33"
 		)
 
-
 	if chemistry_progress:
 
 		chemistry_progress.value = value
-
 
 # ============================================================
 # КНОПКА НОВОГО ДРАФТА
@@ -2309,7 +1667,6 @@ func _create_draft_button() -> void:
 	):
 
 		draft_button.queue_free()
-
 
 	draft_button = Button.new()
 
@@ -2325,22 +1682,18 @@ func _create_draft_button() -> void:
 		76
 	)
 
-
 	draft_button.add_theme_font_size_override(
 		"font_size",
 		14
 	)
 
-
 	draft_button.mouse_default_cursor_shape = (
 		Control.CURSOR_POINTING_HAND
 	)
 
-
 	draft_button.pressed.connect(
 		start_new_draft
 	)
-
 
 	_apply_button_style(
 		draft_button,
@@ -2351,11 +1704,9 @@ func _create_draft_button() -> void:
 		)
 	)
 
-
 	top_layer.add_child(
 		draft_button
 	)
-
 
 # ============================================================
 # ЗАВЕРШЕНИЕ ДРАФТА
@@ -2366,14 +1717,11 @@ func finish_draft() -> void:
 	draft_in_progress = false
 	selecting_position = false
 
-
 	_clear_position_buttons()
-
 
 	var match_scene := load(
 		"res://MatchScreen.tscn"
 	) as PackedScene
-
 
 	if match_scene == null:
 
@@ -2381,31 +1729,25 @@ func finish_draft() -> void:
 			"Не удалось загрузить res://MatchScreen.tscn"
 		)
 
-
 		if summary_screen_scene:
 
 			var summary := (
 				summary_screen_scene.instantiate()
 			)
 
-
 			add_child(
 				summary
 			)
 
-
 		return
-
 
 	var match_screen := (
 		match_scene.instantiate()
 	)
 
-
 	add_child(
 		match_screen
 	)
-
 
 	if match_screen.has_method(
 		"setup"
@@ -2414,7 +1756,6 @@ func finish_draft() -> void:
 		match_screen.setup(
 			PlayerData.current_draft_team
 		)
-
 
 # ============================================================
 # МАГАЗИН
@@ -2426,7 +1767,6 @@ func _on_store_pressed() -> void:
 		"res://StoreScreen.tscn"
 	)
 
-
 # ============================================================
 # МОЙ КЛУБ
 # ============================================================
@@ -2436,7 +1776,6 @@ func _on_club_pressed() -> void:
 	get_tree().change_scene_to_file(
 		"res://ClubScreen.tscn"
 	)
-
 
 # ============================================================
 # СТИЛЬ ОБЫЧНОЙ КНОПКИ
@@ -2456,12 +1795,10 @@ func _apply_button_style(
 	normal.corner_radius_bottom_left = 11
 	normal.corner_radius_bottom_right = 11
 
-
 	normal.border_width_left = 1
 	normal.border_width_right = 1
 	normal.border_width_top = 1
 	normal.border_width_bottom = 1
-
 
 	normal.border_color = Color(
 		1,
@@ -2470,15 +1807,12 @@ func _apply_button_style(
 		0.08
 	)
 
-
 	button.add_theme_stylebox_override(
 		"normal",
 		normal
 	)
 
-
 	var hover := normal.duplicate()
-
 
 	hover.bg_color = Color(
 		min(
@@ -2495,15 +1829,12 @@ func _apply_button_style(
 		)
 	)
 
-
 	button.add_theme_stylebox_override(
 		"hover",
 		hover
 	)
 
-
 	var pressed := normal.duplicate()
-
 
 	pressed.bg_color = Color(
 		max(
@@ -2520,21 +1851,17 @@ func _apply_button_style(
 		)
 	)
 
-
 	button.add_theme_stylebox_override(
 		"pressed",
 		pressed
 	)
 
-
 	var focus := normal.duplicate()
-
 
 	focus.border_width_left = 2
 	focus.border_width_right = 2
 	focus.border_width_top = 2
 	focus.border_width_bottom = 2
-
 
 	focus.border_color = Color(
 		1,
@@ -2542,7 +1869,6 @@ func _apply_button_style(
 		1,
 		0.20
 	)
-
 
 	button.add_theme_stylebox_override(
 		"focus",
