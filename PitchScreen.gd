@@ -135,7 +135,7 @@ func _notification(what: int) -> void:
 		queue_redraw()
 
 # ============================================================
-# РАЗМЕР ПОЛЯ (ИСПРАВЛЕНО - FIFA ПРОПОРЦИИ)
+# РАЗМЕР ПОЛЯ (FIFA ПРОПОРЦИИ)
 # ============================================================
 
 func _update_field_rect() -> void:
@@ -483,7 +483,7 @@ func setup_top_ui_layer() -> void:
 	)
 
 # ============================================================
-# РИСОВАНИЕ ПОЛЯ (ИСПРАВЛЕНО - ПРАВИЛЬНЫЕ ПРОПОРЦИИ)
+# РИСОВАНИЕ ПОЛЯ (FIFA ПРОПОРЦИИ)
 # ============================================================
 
 func _draw() -> void:
@@ -521,7 +521,7 @@ func _draw() -> void:
 
 	# 5. Полосы газона (10 широких полос)
 	var stripe_count := 10
-	var stripe_height := field_height / float(stripe_count)
+	var stripe_height: float = field_height / float(stripe_count)
 	for i in range(stripe_count):
 		var stripe_color := Color(0.055, 0.265, 0.115, 1.0) if i % 2 == 0 else Color(0.040, 0.220, 0.090, 1.0)
 		draw_rect(
@@ -532,7 +532,7 @@ func _draw() -> void:
 
 	# 6. Лёгкая виньетка по краям
 	var vignette_strength := 0.12
-	var edge := field_width * 0.05
+	var edge: float = field_width * 0.05
 	draw_rect(Rect2(field.position.x, field.position.y, field_width, edge), Color(0, 0, 0, vignette_strength), true)
 	draw_rect(Rect2(field.position.x, field.end.y - edge, field_width, edge), Color(0, 0, 0, vignette_strength), true)
 	draw_rect(Rect2(field.position.x, field.position.y, edge, field_height), Color(0, 0, 0, vignette_strength), true)
@@ -547,14 +547,14 @@ func _draw() -> void:
 
 	# 9. Центральный круг (радиус 9.15м при ширине 68м = 0.1346 от ширины)
 	var center := Vector2(field.position.x + field_width * 0.5, center_y)
-	var center_radius := field_width * 0.1346
+	var center_radius: float = field_width * 0.1346
 	draw_arc(center, center_radius, 0.0, TAU, 64, line_color, line_width)
 	draw_circle(center, 3.0, line_color)
 
 	# 10. Штрафные площади (ширина 40.32м = 0.593 от ширины поля, глубина 16.5м = 0.157 от длины)
-	var penalty_box_width := field_width * 0.593
-	var penalty_box_height := field_height * 0.157
-	var penalty_box_x := field.position.x + (field_width - penalty_box_width) * 0.5
+	var penalty_box_width: float = field_width * 0.593
+	var penalty_box_height: float = field_height * 0.157
+	var penalty_box_x: float = field.position.x + (field_width - penalty_box_width) * 0.5
 	
 	var top_penalty_box := Rect2(penalty_box_x, field.position.y, penalty_box_width, penalty_box_height)
 	var bottom_penalty_box := Rect2(penalty_box_x, field.end.y - penalty_box_height, penalty_box_width, penalty_box_height)
@@ -563,9 +563,9 @@ func _draw() -> void:
 	draw_rect(bottom_penalty_box, line_color, false, line_width)
 
 	# 11. Вратарские площади (ширина 18.32м = 0.269 от ширины, глубина 5.5м = 0.052 от длины)
-	var goal_box_width := field_width * 0.269
-	var goal_box_height := field_height * 0.052
-	var goal_box_x := field.position.x + (field_width - goal_box_width) * 0.5
+	var goal_box_width: float = field_width * 0.269
+	var goal_box_height: float = field_height * 0.052
+	var goal_box_x: float = field.position.x + (field_width - goal_box_width) * 0.5
 	
 	var top_goal_box := Rect2(goal_box_x, field.position.y, goal_box_width, goal_box_height)
 	var bottom_goal_box := Rect2(goal_box_x, field.end.y - goal_box_height, goal_box_width, goal_box_height)
@@ -574,9 +574,9 @@ func _draw() -> void:
 	draw_rect(bottom_goal_box, line_color, false, line_width)
 
 	# 12. Врата (визуальные)
-	var goal_width := field_width * 0.108
-	var goal_depth := field_height * 0.02
-	var goal_x := field.position.x + (field_width - goal_width) * 0.5
+	var goal_width: float = field_width * 0.108
+	var goal_depth: float = field_height * 0.02
+	var goal_x: float = field.position.x + (field_width - goal_width) * 0.5
 	
 	var top_goal := Rect2(goal_x, field.position.y - goal_depth, goal_width, goal_depth)
 	var bottom_goal := Rect2(goal_x, field.end.y, goal_width, goal_depth)
@@ -585,7 +585,7 @@ func _draw() -> void:
 	draw_rect(bottom_goal, Color(0.90, 0.95, 0.92, 0.40), true)
 
 	# 13. Точки пенальти (11м от линии ворот = 0.105 от длины поля)
-	var penalty_spot_offset := field_height * 0.105
+	var penalty_spot_offset: float = field_height * 0.105
 	var top_penalty_spot := Vector2(field.position.x + field_width * 0.5, field.position.y + penalty_spot_offset)
 	var bottom_penalty_spot := Vector2(field.position.x + field_width * 0.5, field.end.y - penalty_spot_offset)
 	
@@ -593,14 +593,14 @@ func _draw() -> void:
 	draw_circle(bottom_penalty_spot, 3.0, line_color)
 
 	# 14. Дуги штрафной (радиус 9.15м = 0.1346 от ширины)
-	var penalty_arc_radius := field_width * 0.1346
+	var penalty_arc_radius: float = field_width * 0.1346
 	# Верхняя дуга (от точки пенальти, направлена к центру)
 	draw_arc(top_penalty_spot, penalty_arc_radius, 0.0, PI, 40, line_color, thin_line_width)
 	# Нижняя дуга (от точки пенальти, направлена к центру)
 	draw_arc(bottom_penalty_spot, penalty_arc_radius, PI, TAU, 40, line_color, thin_line_width)
 
 	# 15. Угловые дуги (радиус 1м = 0.0147 от ширины)
-	var corner_radius := field_width * 0.0147
+	var corner_radius: float = field_width * 0.0147
 	# Верхний левый
 	draw_arc(field.position, corner_radius, 0.0, PI * 0.5, 20, line_color, thin_line_width)
 	# Верхний правый
@@ -1087,7 +1087,7 @@ func _on_player_selected(
 		selecting_position = true
 
 # ============================================================
-# ПОМЕТИТЬ ПОЗИЦИЮ КАК ЗАПОЛНЕННУЮ
+# ПОМЕТИТЬ ПОЗИЦИЮ КАК ЗАПОЛНЕННУЮ (ИСПРАВЛЕНО - скрывать кнопку)
 # ============================================================
 
 func _mark_position_as_filled(
@@ -1104,22 +1104,8 @@ func _mark_position_as_filled(
 		slot_index
 	]
 
-	button.text = "✓ " + str(
-		formation_slots[
-			slot_index
-		].get(
-			"position",
-			"?"
-		)
-	)
-
-	button.disabled = true
-
-	_apply_position_button_style(
-		button,
-		false,
-		true
-	)
+	# Скрываем кнопку полностью после заполнения
+	button.visible = false
 
 # ============================================================
 # АКТИВНОСТЬ КНОПОК ПОЗИЦИЙ
@@ -1417,7 +1403,7 @@ func _create_field_card(
 	)
 
 # ============================================================
-# ПОЗИЦИОНИРОВАНИЕ КАРТОЧКИ
+# ПОЗИЦИОНИРОВАНИЕ КАРТОЧКИ (ИСПРАВЛЕНО - центрирование)
 # ============================================================
 
 func _position_card_node(
@@ -1430,9 +1416,10 @@ func _position_card_node(
 
 	var control := card_node as Control
 
+	# Уменьшенный размер карточки (было 0.19, стало 0.14)
 	var target_width: float = min(
-		field_rect.size.x * 0.19,
-		125.0
+		field_rect.size.x * 0.14,
+		95.0
 	)
 
 	var scale_factor: float = (
@@ -1444,12 +1431,11 @@ func _position_card_node(
 		scale_factor
 	)
 
+	# Центрируем карточку на позиции слота
+	# Карточка 180x260, центр в (90, 130)
 	control.position = (
 		field_position
-		- Vector2(
-			90.0 * scale_factor,
-			130.0 * scale_factor
-		)
+		- Vector2(90.0, 130.0) * scale_factor
 	)
 
 # ============================================================
@@ -1647,7 +1633,7 @@ func _update_chemistry_display(
 	if chem_label:
 
 		chem_label.text = (
-			"  Сыгранность  "
+			"⚡  Сыгранность  "
 			+ str(value)
 			+ " / 33"
 		)
@@ -1670,7 +1656,7 @@ func _create_draft_button() -> void:
 
 	draft_button = Button.new()
 
-	draft_button.text = "⚡  НОВЫЙ ДРАФТ"
+	draft_button.text = "  НОВЫЙ ДРАФТ"
 
 	draft_button.custom_minimum_size = Vector2(
 		180,
