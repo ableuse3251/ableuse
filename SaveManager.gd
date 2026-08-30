@@ -50,6 +50,42 @@ func save_game() -> void:
 	file.close()
 	print("SaveManager: игра сохранена.")
 
+# ============================================================
+# АТОМАРНЫЕ МЕТОДЫ СОХРАНЕНИЯ (ОПТИМИЗАЦИЯ)
+# ============================================================
+
+func save_lineup_and_subs(lineup: Array, subs: Array) -> void:
+	var lineup_data: Array = []
+	for card in lineup:
+		if card == null:
+			lineup_data.append({"id": ""})
+		elif card is PlayerCard:
+			var player_data: Dictionary = {"id": card.id}
+			lineup_data.append(player_data)
+		else:
+			lineup_data.append({"id": ""})
+	
+	var subs_data: Array = []
+	for card in subs:
+		if not card is PlayerCard:
+			continue
+		var player_data: Dictionary = {"id": card.id}
+		subs_data.append(player_data)
+	
+	save_data["starting_lineup"] = lineup_data
+	save_data["substitutes"] = subs_data
+	save_game()
+	print("SaveManager: сохранены состав (", lineup_data.size(), " слотов) и запасные (", subs_data.size(), " игроков) за одну операцию")
+
+func save_formation(formation: String) -> void:
+	save_data["formation"] = formation
+	save_game()
+	print("SaveManager: сохранена схема: ", formation)
+
+# ============================================================
+# СТАРЫЕ МЕТОДЫ (ДЛЯ СОВМЕСТИМОСТИ)
+# ============================================================
+
 func set_coins(value: int) -> void:
 	save_data["coins"] = value
 	save_game()
@@ -94,14 +130,12 @@ func set_starting_lineup(lineup: Array) -> void:
 	var lineup_data: Array = []
 	for card in lineup:
 		if card == null:
-			lineup_data.append({"id": ""}) # Пустой слот
+			lineup_data.append({"id": ""})
 		elif card is PlayerCard:
-			var player_data: Dictionary = {
-				"id": card.id
-			}
+			var player_data: Dictionary = {"id": card.id}
 			lineup_data.append(player_data)
 		else:
-			lineup_data.append({"id": ""}) # Неизвестный тип
+			lineup_data.append({"id": ""})
 	
 	save_data["starting_lineup"] = lineup_data
 	save_game()
@@ -117,9 +151,7 @@ func set_substitutes(subs: Array) -> void:
 	for card in subs:
 		if not card is PlayerCard:
 			continue
-		var player_data: Dictionary = {
-			"id": card.id
-		}
+		var player_data: Dictionary = {"id": card.id}
 		subs_data.append(player_data)
 	
 	save_data["substitutes"] = subs_data
