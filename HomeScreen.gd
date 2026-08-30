@@ -251,7 +251,7 @@ func _on_squad_pressed() -> void:
 	get_tree().change_scene_to_file("res://SquadScreen.tscn")
 
 func _on_draft_pressed() -> void:
-	get_tree().change_scene_to_file("res://DraftSelectScreen.tscn")
+	get_tree().change_scene_to_file("res://PitchScreen.tscn")
 
 func _on_store_pressed() -> void:
 	get_tree().change_scene_to_file("res://StoreScreen.tscn")
