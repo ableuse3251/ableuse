@@ -51,7 +51,7 @@ func _load_club_data() -> void:
 		if lineup_data is Dictionary:
 			var player_id: String = str(lineup_data.get("id", ""))
 			if player_id.is_empty():
-				starting_lineup.append(null) # Пустой слот
+				starting_lineup.append(null)
 			else:
 				var card := _find_card_by_id(player_id)
 				starting_lineup.append(card)
@@ -94,8 +94,7 @@ func remove_card_from_club(card: PlayerCard) -> void:
 	starting_lineup.erase(card)
 	substitutes.erase(card)
 	SaveManager.set_club_cards(club_cards)
-	SaveManager.set_starting_lineup(starting_lineup)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: удалена карта ", card.player_name)
 
 # ============================================================
@@ -115,57 +114,50 @@ func get_current_formation() -> String:
 
 func set_formation(formation: String) -> void:
 	current_formation = formation
-	SaveManager.set_formation(current_formation)
+	SaveManager.save_formation(current_formation)
 	print("ClubManager: схема изменена на ", current_formation)
 
 func add_player_to_lineup(card: PlayerCard) -> void:
 	if card == null or card in starting_lineup:
 		return
-	# Если игрок был в запасе, убираем его оттуда
 	substitutes.erase(card)
 	starting_lineup.append(card)
-	SaveManager.set_starting_lineup(starting_lineup)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " добавлен в стартовый состав")
 
 func remove_player_from_lineup(card: PlayerCard) -> void:
 	if card == null:
 		return
 	starting_lineup.erase(card)
-	SaveManager.set_starting_lineup(starting_lineup)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " удален из стартового состава")
 
 func set_player_in_lineup(slot_index: int, card: PlayerCard) -> void:
 	if card == null:
 		return
-	# Если игрок уже в составе, убираем его оттуда
 	starting_lineup.erase(card)
-	# Если игрок был в запасе, убираем его оттуда
 	substitutes.erase(card)
 	
-	# Расширяем массив, если нужно
 	while starting_lineup.size() <= slot_index:
 		starting_lineup.append(null)
 	
-	# Устанавливаем игрока в конкретный слот
 	starting_lineup[slot_index] = card
 	
-	SaveManager.set_starting_lineup(starting_lineup)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " установлен в слот ", slot_index)
 
 func add_player_to_substitutes(card: PlayerCard) -> void:
 	if card == null or card in substitutes or card in starting_lineup:
 		return
 	substitutes.append(card)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " добавлен в запас")
 
 func remove_player_from_substitutes(card: PlayerCard) -> void:
 	if card == null:
 		return
 	substitutes.erase(card)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " удален из запаса")
 
 func move_to_substitutes(card: PlayerCard) -> void:
@@ -173,8 +165,7 @@ func move_to_substitutes(card: PlayerCard) -> void:
 		return
 	starting_lineup.erase(card)
 	substitutes.append(card)
-	SaveManager.set_starting_lineup(starting_lineup)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " перемещен в запас")
 
 func move_to_lineup(card: PlayerCard) -> void:
@@ -182,6 +173,5 @@ func move_to_lineup(card: PlayerCard) -> void:
 		return
 	substitutes.erase(card)
 	starting_lineup.append(card)
-	SaveManager.set_starting_lineup(starting_lineup)
-	SaveManager.set_substitutes(substitutes)
+	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " перемещен в стартовый состав")
