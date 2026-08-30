@@ -4,7 +4,7 @@ extends Control
 # ================================================================
 # ДАННЫЕ МАТЧА
 # ================================================================
-var team: Array = []
+var team: Array[PlayerCard] = []
 var match_result: Dictionary = {}
 
 var home_name_label: Label
@@ -30,7 +30,7 @@ var match_timer: Timer
 # ================================================================
 # ПОЛУЧЕНИЕ КОМАНДЫ
 # ================================================================
-func setup(match_team: Array) -> void:
+func setup(match_team: Array[PlayerCard]) -> void:
 	team = match_team.duplicate()
 	if is_node_ready():
 		_start_match()
@@ -42,8 +42,81 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build_ui()
-	if team.size() > 0:
+	
+	# Если команда не была передана через setup(), пробуем получить её
+	if team.size() == 0:
+		if PlayerData.current_draft_team.size() >= 11:
+			team = PlayerData.current_draft_team.duplicate()
+		else:
+			var clean_team: Array[PlayerCard] = []
+			for card in ClubManager.get_starting_lineup():
+				if card != null and card is PlayerCard:
+					clean_team.append(card)
+			team = clean_team
+			
+	if team.size() >= 11:
 		_start_match()
+	else:
+		_show_no_team_message()
+
+# ================================================================
+# СООБЩЕНИЕ ЕСЛИ НЕТ СОСТАВА
+# ================================================================
+func _show_no_team_message() -> void:
+	for child in get_children():
+		child.queue_free()
+		
+	var background := ColorRect.new()
+	background.color = Color(0.025, 0.035, 0.055, 1.0)
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(background)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
+
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	center.add_child(vbox)
+
+	var warning_icon := Label.new()
+	warning_icon.text = "⚠️"
+	warning_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	warning_icon.add_theme_font_size_override("font_size", 80)
+	vbox.add_child(warning_icon)
+
+	var warning_text := Label.new()
+	warning_text.text = "Сначала собери состав!"
+	warning_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	warning_text.add_theme_font_size_override("font_size", 28)
+	warning_text.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
+	vbox.add_child(warning_text)
+
+	var sub_text := Label.new()
+	sub_text.text = "Перейди в 'Мой состав' и добавь минимум 11 игроков"
+	sub_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub_text.add_theme_font_size_override("font_size", 16)
+	sub_text.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.7))
+	vbox.add_child(sub_text)
+
+	var go_to_squad_btn := Button.new()
+	go_to_squad_btn.text = "👥 Перейти к составу"
+	go_to_squad_btn.custom_minimum_size = Vector2(250, 50)
+	go_to_squad_btn.add_theme_font_size_override("font_size", 18)
+	go_to_squad_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	go_to_squad_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://SquadScreen.tscn"))
+	_apply_button_style(go_to_squad_btn, Color(0.12, 0.55, 0.28))
+	vbox.add_child(go_to_squad_btn)
+
+	var back_btn := Button.new()
+	back_btn.text = "← Домой"
+	back_btn.custom_minimum_size = Vector2(200, 45)
+	back_btn.add_theme_font_size_override("font_size", 16)
+	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://HomeScreen.tscn"))
+	_apply_button_style(back_btn, Color(0.10, 0.12, 0.17))
+	vbox.add_child(back_btn)
 
 # ================================================================
 # ПОСТРОЕНИЕ UI
@@ -348,7 +421,13 @@ func _give_match_reward() -> void:
 		reward = 300
 	else:
 		reward = 200
-	UserProfile.add_coins(reward)
+		
+	if UserProfile.has_method("add_coins"):
+		UserProfile.add_coins(reward)
+	else:
+		UserProfile.coins += reward
+		SaveManager.set_coins(UserProfile.coins)
+		
 	print("MatchScreen: награда за матч +", reward, " монет. Баланс: ", UserProfile.coins)
 	if SaveManager and SaveManager.has_method("save_game"):
 		SaveManager.save_game()
@@ -366,7 +445,6 @@ func _show_summary() -> void:
 func _on_back_pressed() -> void:
 	if is_instance_valid(match_timer):
 		match_timer.stop()
-	# ИСПРАВЛЕНО: строгое соответствие правилу унифицированной навигации
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
 
 func _apply_button_style(button: Button, background_color: Color) -> void:
