@@ -28,7 +28,7 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	# ============================================================
-	# ВЕРХНЯЯ ПАНЕЛЬ (добавляем ПЕРВОЙ)
+	# ВЕРХНЯЯ ПАНЕЛЬ
 	# ============================================================
 	var top_panel := PanelContainer.new()
 	top_panel.custom_minimum_size = Vector2(0, 70)
@@ -154,7 +154,7 @@ func _build_ui() -> void:
 	card_vbox.add_child(status_label)
 
 	# ============================================================
-	# НИЖНЯЯ НАВИГАЦИЯ (добавляем ПОСЛЕДНЕЙ)
+	# НИЖНЯЯ НАВИГАЦИЯ
 	# ============================================================
 	var bottom_panel := PanelContainer.new()
 	bottom_panel.custom_minimum_size = Vector2(0, 90)
@@ -183,7 +183,7 @@ func _build_ui() -> void:
 	bottom_margin.add_child(nav_hbox)
 
 	_create_nav_button(nav_hbox, "📦", "Коллекция", _on_collection_pressed, Color(0.15, 0.25, 0.4))
-	_create_nav_button(nav_hbox, "👥", "Состав", _on_lineup_pressed, Color(0.15, 0.35, 0.25))
+	_create_nav_button(nav_hbox, "👥", "Мой состав", _on_squad_pressed, Color(0.15, 0.35, 0.25))
 	_create_nav_button(nav_hbox, "🎯", "Драфт", _on_draft_pressed, Color(0.35, 0.2, 0.15))
 	_create_nav_button(nav_hbox, "🛒", "Магазин", _on_store_pressed, Color(0.4, 0.3, 0.1))
 	_create_nav_button(nav_hbox, "⚽", "Матч", _on_match_pressed, Color(0.3, 0.15, 0.15))
@@ -247,8 +247,8 @@ func _update_club_info() -> void:
 func _on_collection_pressed() -> void:
 	get_tree().change_scene_to_file("res://ClubScreen.tscn")
 
-func _on_lineup_pressed() -> void:
-	get_tree().change_scene_to_file("res://FormationSelectScreen.tscn")
+func _on_squad_pressed() -> void:
+	get_tree().change_scene_to_file("res://SquadScreen.tscn")
 
 func _on_draft_pressed() -> void:
 	get_tree().change_scene_to_file("res://DraftSelectScreen.tscn")
