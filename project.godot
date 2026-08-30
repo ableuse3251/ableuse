@@ -23,6 +23,8 @@ ClubManager="*uid://drdhmxfq42t72"
 CardDatabase="*uid://31vvnyi4rrj"
 PlayerData="*uid://both11ymusb01"
 McpRuntime="*res://addons/godot-mcp/mcp_runtime.gd"
+CardPool="*res://CardUIPool.gd"
+FormationManager="*uid://kbn6f2w35iam"
 
 [display]
 

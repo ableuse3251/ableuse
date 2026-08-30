@@ -562,3 +562,49 @@ func _gui_input(event: InputEvent) -> void:
 		if event.pressed:
 			card_selected.emit(player_data)
 			accept_event()
+
+# ============================================================
+# СБРОС СОСТОЯНИЯ (ДЛЯ OBJECT POOLING)
+# ============================================================
+
+func reset() -> void:
+	player_data = null
+	is_compact = false
+	
+	# Очищаем тексты
+	if name_label:
+		name_label.text = ""
+	if rating_label:
+		rating_label.text = ""
+	if pos_label:
+		pos_label.text = ""
+	if club_label:
+		club_label.text = ""
+	if nation_label:
+		nation_label.text = ""
+	if rarity_label:
+		rarity_label.text = ""
+	if pace_label:
+		pace_label.text = "PAC  0"
+	if shooting_label:
+		shooting_label.text = "SHO  0"
+	if passing_label:
+		passing_label.text = "PAS  0"
+	if dribbling_label:
+		dribbling_label.text = "DRI  0"
+	if defending_label:
+		defending_label.text = "DEF  0"
+	if physical_label:
+		physical_label.text = "PHY  0"
+	
+	# Сбрасываем цвета рамки
+	if main_panel:
+		var style: StyleBoxFlat = main_panel.get_theme_stylebox("panel")
+		if style:
+			style.border_color = Color(0.95, 0.75, 0.2, 0.9)
+	
+	if glow_panel:
+		var glow_style: StyleBoxFlat = glow_panel.get_theme_stylebox("panel")
+		if glow_style:
+			glow_style.bg_color = Color(1.0, 0.8, 0.2, 0.15)
+			glow_style.shadow_color = Color(0.0, 0.0, 0.0, 0.5)

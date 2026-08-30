@@ -16,7 +16,6 @@ var database: Array[PlayerCard] = []
 var players_by_position: Dictionary = {}
 var players_by_rarity: Dictionary = {}
 var players_by_league: Dictionary = {}
-var players_by_name_lower: Dictionary = {} # НОВЫЙ КЭШ ДЛЯ БЫСТРОГО ПОИСКА ПО ИМЕНИ
 
 # ============================================================
 # READY
@@ -34,7 +33,6 @@ func _load_database() -> void:
 	players_by_position.clear()
 	players_by_rarity.clear()
 	players_by_league.clear()
-	players_by_name_lower.clear()
 
 	if not FileAccess.file_exists(DATABASE_PATH):
 		push_error("CardDatabase: файл не найден: " + DATABASE_PATH)
@@ -74,13 +72,11 @@ func _load_database() -> void:
 		_add_to_position_cache(card)
 		_add_to_rarity_cache(card)
 		_add_to_league_cache(card)
-		_add_to_name_cache(card) # НОВОЕ: добавляем в кэш имён
 
 	print("CardDatabase: загружено игроков: ", database.size())
 	print("CardDatabase: позиций в кэше: ", players_by_position.size())
 	print("CardDatabase: редкостей в кэше: ", players_by_rarity.size())
 	print("CardDatabase: лиг в кэше: ", players_by_league.size())
-	print("CardDatabase: имён в кэше: ", players_by_name_lower.size())
 	print("============================================================")
 
 # ============================================================
@@ -125,16 +121,6 @@ func _add_to_league_cache(card: PlayerCard) -> void:
 		players_by_league[league] = []
 	players_by_league[league].append(card)
 
-# НОВЫЙ МЕТОД: Кэширование имени для поиска за O(1)
-func _add_to_name_cache(card: PlayerCard) -> void:
-	var name_lower: String = card.player_name.strip_edges().to_lower()
-	if name_lower != "":
-		players_by_name_lower[name_lower] = card.id
-	
-	var long_name_lower: String = card.long_name.strip_edges().to_lower()
-	if long_name_lower != "" and long_name_lower != name_lower:
-		players_by_name_lower[long_name_lower] = card.id
-
 # ============================================================
 # ПОЛУЧЕНИЕ ДАННЫХ
 # ============================================================
@@ -150,13 +136,6 @@ func get_player_by_id(player_id: String) -> PlayerCard:
 		if card.id == player_id:
 			return card
 	return null
-
-# НОВЫЙ МЕТОД: Мгновенный поиск ID по имени (O(1))
-func get_player_id_by_name_lower(target_name: String) -> String:
-	var target: String = target_name.strip_edges().to_lower()
-	if players_by_name_lower.has(target):
-		return players_by_name_lower[target]
-	return ""
 
 func get_players_by_position(position: String) -> Array[PlayerCard]:
 	var result: Array[PlayerCard] = []
