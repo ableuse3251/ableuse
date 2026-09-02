@@ -16,6 +16,7 @@ func _ready() -> void:
 
 	_build_ui()
 	_update_club_info()
+	_check_onboarding()
 
 func _build_ui() -> void:
 	# ============================================================
@@ -73,6 +74,27 @@ func _build_ui() -> void:
 	coins_label.add_theme_font_size_override("font_size", 18)
 	coins_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.35))
 	top_hbox.add_child(coins_label)
+
+	var settings_button := Button.new()
+	settings_button.text = "⚙️"
+	settings_button.custom_minimum_size = Vector2(44, 44)
+	settings_button.add_theme_font_size_override("font_size", 22)
+	settings_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	settings_button.pressed.connect(_on_settings_pressed)
+	var settings_normal := StyleBoxFlat.new()
+	settings_normal.bg_color = Color(0.10, 0.13, 0.18, 1.0)
+	settings_normal.corner_radius_top_left = 10
+	settings_normal.corner_radius_top_right = 10
+	settings_normal.corner_radius_bottom_left = 10
+	settings_normal.corner_radius_bottom_right = 10
+	settings_button.add_theme_stylebox_override("normal", settings_normal)
+	var settings_hover := settings_normal.duplicate()
+	settings_hover.bg_color = Color(0.16, 0.20, 0.27, 1.0)
+	settings_button.add_theme_stylebox_override("hover", settings_hover)
+	var settings_pressed := settings_normal.duplicate()
+	settings_pressed.bg_color = Color(0.07, 0.09, 0.13, 1.0)
+	settings_button.add_theme_stylebox_override("pressed", settings_pressed)
+	top_hbox.add_child(settings_button)
 
 	# ============================================================
 	# ЦЕНТРАЛЬНАЯ ЧАСТЬ
@@ -244,6 +266,13 @@ func _update_club_info() -> void:
 			var avg_rating := total_rating / cards.size()
 			club_rating_label.text = "Рейтинг: " + str(int(avg_rating))
 
+func _check_onboarding() -> void:
+	if not SaveManager.is_onboarding_completed():
+		call_deferred("_go_to_onboarding")
+
+func _go_to_onboarding() -> void:
+	get_tree().change_scene_to_file("res://OnboardingScreen.tscn")
+
 func _on_collection_pressed() -> void:
 	get_tree().change_scene_to_file("res://ClubScreen.tscn")
 
@@ -258,6 +287,9 @@ func _on_store_pressed() -> void:
 
 func _on_match_pressed() -> void:
 	get_tree().change_scene_to_file("res://MatchScreen.tscn")
+
+func _on_settings_pressed() -> void:
+	get_tree().change_scene_to_file("res://SettingsScreen.tscn")
 
 func _on_visibility_changed() -> void:
 	if visible:

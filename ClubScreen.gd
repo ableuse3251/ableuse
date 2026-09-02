@@ -118,6 +118,19 @@ func _refresh_cards() -> void:
 func _on_card_clicked(event: InputEvent, card: PlayerCard) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		print("ClubScreen: клик по игроку -> ", card.player_name)
+		_open_player_details(card)
+
+func _open_player_details(card: PlayerCard) -> void:
+	if card == null:
+		return
+	var details_scene := load("res://PlayerDetailsScreen.tscn") as PackedScene
+	if details_scene == null:
+		push_error("ClubScreen: не удалось загрузить PlayerDetailsScreen.tscn")
+		return
+	var details := details_scene.instantiate()
+	add_child(details)
+	if details.has_method("setup"):
+		details.setup(card)
 
 func _apply_button_style(button: Button, background_color: Color) -> void:
 	var normal := StyleBoxFlat.new()

@@ -14,6 +14,7 @@ var rarity_label: Label
 
 var photo_area: Panel
 var close_button: Button
+var squad_button: Button
 
 
 func setup(card: PlayerCard) -> void:
@@ -391,7 +392,7 @@ func _build_ui() -> void:
 	# КНОПКА СОСТАВА
 	# ============================================================
 
-	var squad_button := Button.new()
+	squad_button = Button.new()
 
 	squad_button.text = "В СОСТАВ"
 
@@ -408,6 +409,9 @@ func _build_ui() -> void:
 	squad_button.mouse_default_cursor_shape = (
 		Control.CURSOR_POINTING_HAND
 	)
+
+	squad_button.pressed.connect(_on_squad_pressed)
+	_apply_button_style(squad_button, Color(0.12, 0.55, 0.28))
 
 	main.add_child(squad_button)
 
@@ -541,6 +545,14 @@ func _update_player_info() -> void:
 			player_card.rarity
 		)
 
+	if squad_button and is_instance_valid(ClubManager):
+		var already_in_lineup: bool = player_card in ClubManager.starting_lineup
+		if already_in_lineup:
+			squad_button.disabled = true
+			squad_button.text = "УЖЕ В СОСТАВЕ"
+		else:
+			squad_button.disabled = false
+			squad_button.text = "В СОСТАВ"
 
 	# ============================================================
 	# ФОТО
@@ -645,6 +657,28 @@ func _input(event: InputEvent) -> void:
 					_close()
 
 
+func _on_squad_pressed() -> void:
+	if player_card == null:
+		return
+
+	if not is_instance_valid(ClubManager):
+		push_warning("PlayerDetailsScreen: ClubManager не доступен, невозможно добавить игрока в состав.")
+		_close()
+		return
+
+	if player_card in ClubManager.starting_lineup:
+		_close()
+		return
+
+	if not (player_card in ClubManager.club_cards):
+		ClubManager.add_card_to_club(player_card)
+
+	ClubManager.add_player_to_lineup(player_card)
+
+	print("PlayerDetailsScreen: ", player_card.player_name, " добавлен в стартовый состав.")
+	_close()
+
+
 func _close() -> void:
 	queue_free()
 
@@ -654,3 +688,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.pressed:
 			if event.keycode == KEY_ESCAPE:
 				_close()
+
+
+func _apply_button_style(button: Button, background_color: Color) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = background_color
+	normal.corner_radius_top_left = 14
+	normal.corner_radius_top_right = 14
+	normal.corner_radius_bottom_left = 14
+	normal.corner_radius_bottom_right = 14
+	button.add_theme_stylebox_override("normal", normal)
+
+	var hover := normal.duplicate()
+	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
+	button.add_theme_stylebox_override("hover", hover)
+
+	var pressed := normal.duplicate()
+	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
+	button.add_theme_stylebox_override("pressed", pressed)

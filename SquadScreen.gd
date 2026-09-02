@@ -46,16 +46,19 @@ func _ready() -> void:
 	_build_ui()
 	call_deferred("_initialize_field")
 
+
 func _initialize_field() -> void:
 	_update_field_rect()
 	_refresh_squad()
 	queue_redraw()
+
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_update_field_rect()
 		_reposition_slots_and_cards()
 		queue_redraw()
+
 
 # ============================================================
 # ПОСТРОЕНИЕ UI
@@ -65,6 +68,7 @@ func _build_ui() -> void:
 	top_panel.custom_minimum_size = Vector2(0, 60)
 	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	top_panel.offset_bottom = 60
+	
 	var top_style := StyleBoxFlat.new()
 	top_style.bg_color = Color(0.05, 0.08, 0.12, 0.95)
 	top_style.corner_radius_bottom_left = 12
@@ -125,6 +129,7 @@ func _build_ui() -> void:
 	subs_panel.custom_minimum_size = Vector2(0, 160)
 	subs_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	subs_panel.offset_top = -160
+	
 	var subs_style := StyleBoxFlat.new()
 	subs_style.bg_color = Color(0.04, 0.06, 0.09, 0.95)
 	subs_style.border_width_top = 2
@@ -171,6 +176,7 @@ func _build_ui() -> void:
 	selection_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	selection_overlay.visible = false
 	selection_overlay.z_index = 100
+	
 	var overlay_style := StyleBoxFlat.new()
 	overlay_style.bg_color = Color(0.0, 0.0, 0.0, 0.92)
 	selection_overlay.add_theme_stylebox_override("panel", overlay_style)
@@ -216,6 +222,7 @@ func _build_ui() -> void:
 	formation_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	formation_overlay.visible = false
 	formation_overlay.z_index = 100
+	
 	var form_overlay_style := StyleBoxFlat.new()
 	form_overlay_style.bg_color = Color(0.0, 0.0, 0.0, 0.92)
 	formation_overlay.add_theme_stylebox_override("panel", form_overlay_style)
@@ -261,6 +268,7 @@ func _build_ui() -> void:
 	card_popup.visible = false
 	card_popup.z_index = 50
 	card_popup.custom_minimum_size = Vector2(180, 100)
+	
 	var popup_style := StyleBoxFlat.new()
 	popup_style.bg_color = Color(0.06, 0.09, 0.14, 0.97)
 	popup_style.set_corner_radius_all(12)
@@ -300,6 +308,7 @@ func _build_ui() -> void:
 	_apply_button_style(remove_btn, Color(0.5, 0.15, 0.15))
 	popup_vbox.add_child(remove_btn)
 
+
 # ============================================================
 # ОТРИСОВКА ПОЛЯ
 # ============================================================
@@ -329,74 +338,164 @@ func _draw() -> void:
 	
 	var stripe_count := 10
 	var stripe_width: float = field_width / float(stripe_count)
+	
 	for i in range(stripe_count):
 		var stripe_color := Color(0.055, 0.265, 0.115, 1.0) if i % 2 == 0 else Color(0.040, 0.220, 0.090, 1.0)
 		draw_rect(
-			Rect2(field.position.x + stripe_width * i, field.position.y, stripe_width + 1.0, field_height),
+			Rect2(
+				field.position.x + stripe_width * i,
+				field.position.y,
+				stripe_width + 1.0,
+				field_height
+			),
 			stripe_color,
 			true
 		)
 	
 	var vignette_strength := 0.12
 	var edge: float = field_width * 0.03
-	draw_rect(Rect2(field.position.x, field.position.y, field_width, edge), Color(0, 0, 0, vignette_strength), true)
-	draw_rect(Rect2(field.position.x, field.end.y - edge, field_width, edge), Color(0, 0, 0, vignette_strength), true)
-	draw_rect(Rect2(field.position.x, field.position.y, edge, field_height), Color(0, 0, 0, vignette_strength), true)
-	draw_rect(Rect2(field.end.x - edge, field.position.y, edge, field_height), Color(0, 0, 0, vignette_strength), true)
+	
+	draw_rect(
+		Rect2(field.position.x, field.position.y, field_width, edge),
+		Color(0, 0, 0, vignette_strength),
+		true
+	)
+	draw_rect(
+		Rect2(field.position.x, field.end.y - edge, field_width, edge),
+		Color(0, 0, 0, vignette_strength),
+		true
+	)
+	draw_rect(
+		Rect2(field.position.x, field.position.y, edge, field_height),
+		Color(0, 0, 0, vignette_strength),
+		true
+	)
+	draw_rect(
+		Rect2(field.end.x - edge, field.position.y, edge, field_height),
+		Color(0, 0, 0, vignette_strength),
+		true
+	)
 	
 	draw_rect(field, line_color, false, line_width)
 	
 	var center_x := field.position.x + field_width * 0.5
-	draw_line(Vector2(center_x, field.position.y), Vector2(center_x, field.end.y), line_color, line_width)
+	draw_line(
+		Vector2(center_x, field.position.y),
+		Vector2(center_x, field.end.y),
+		line_color,
+		line_width
+	)
 	
 	var center := Vector2(center_x, field.position.y + field_height * 0.5)
 	var center_radius: float = field_height * 0.18
-	draw_arc(center, center_radius, 0.0, TAU, 64, line_color, line_width)
+	
+	draw_arc(
+		center,
+		center_radius,
+		0.0,
+		TAU,
+		64,
+		line_color,
+		line_width
+	)
 	draw_circle(center, 3.0, line_color)
 	
 	var penalty_box_width: float = field_width * 0.18
 	var penalty_box_height: float = field_height * 0.50
+	
 	var penalty_box_left := Rect2(
 		field.position.x,
 		field.position.y + (field_height - penalty_box_height) * 0.5,
 		penalty_box_width,
 		penalty_box_height
 	)
+	
 	var penalty_box_right := Rect2(
 		field.end.x - penalty_box_width,
 		field.position.y + (field_height - penalty_box_height) * 0.5,
 		penalty_box_width,
 		penalty_box_height
 	)
+	
 	draw_rect(penalty_box_left, line_color, false, line_width)
 	draw_rect(penalty_box_right, line_color, false, line_width)
 	
 	var goal_box_width: float = field_width * 0.06
 	var goal_box_height: float = field_height * 0.22
+	
 	var goal_box_left := Rect2(
 		field.position.x,
 		field.position.y + (field_height - goal_box_height) * 0.5,
 		goal_box_width,
 		goal_box_height
 	)
+	
 	var goal_box_right := Rect2(
 		field.end.x - goal_box_width,
 		field.position.y + (field_height - goal_box_height) * 0.5,
 		goal_box_width,
 		goal_box_height
 	)
+	
 	draw_rect(goal_box_left, line_color, false, line_width)
 	draw_rect(goal_box_right, line_color, false, line_width)
 	
 	var penalty_spot_offset: float = field_width * 0.12
-	draw_circle(Vector2(field.position.x + penalty_spot_offset, center.y), 3.0, line_color)
-	draw_circle(Vector2(field.end.x - penalty_spot_offset, center.y), 3.0, line_color)
+	
+	draw_circle(
+		Vector2(field.position.x + penalty_spot_offset, center.y),
+		3.0,
+		line_color
+	)
+	
+	draw_circle(
+		Vector2(field.end.x - penalty_spot_offset, center.y),
+		3.0,
+		line_color
+	)
 	
 	var corner_radius: float = min(field_width, field_height) * 0.015
-	draw_arc(field.position, corner_radius, 0.0, PI * 0.5, 20, line_color, thin_line_width)
-	draw_arc(Vector2(field.end.x, field.position.y), corner_radius, PI * 0.5, PI, 20, line_color, thin_line_width)
-	draw_arc(Vector2(field.position.x, field.end.y), corner_radius, PI * 1.5, TAU, 20, line_color, thin_line_width)
-	draw_arc(field.end, corner_radius, PI, PI * 1.5, 20, line_color, thin_line_width)
+	
+	draw_arc(
+		field.position,
+		corner_radius,
+		0.0,
+		PI * 0.5,
+		20,
+		line_color,
+		thin_line_width
+	)
+	
+	draw_arc(
+		Vector2(field.end.x, field.position.y),
+		corner_radius,
+		PI * 0.5,
+		PI,
+		20,
+		line_color,
+		thin_line_width
+	)
+	
+	draw_arc(
+		Vector2(field.position.x, field.end.y),
+		corner_radius,
+		PI * 1.5,
+		TAU,
+		20,
+		line_color,
+		thin_line_width
+	)
+	
+	draw_arc(
+		field.end,
+		corner_radius,
+		PI,
+		PI * 1.5,
+		20,
+		line_color,
+		thin_line_width
+	)
+
 
 # ============================================================
 # ЛОГИКА ПОЛЯ И СЛОТОВ
@@ -404,6 +503,7 @@ func _draw() -> void:
 func _update_field_rect() -> void:
 	var available_width := size.x - 36.0
 	var available_height := size.y - 240.0
+	
 	available_width = max(available_width, 400.0)
 	available_height = max(available_height, 300.0)
 
@@ -420,6 +520,7 @@ func _update_field_rect() -> void:
 
 	field_rect = Rect2(field_x, field_y, field_width, field_height)
 
+
 func _refresh_squad() -> void:
 	_hide_card_popup()
 	formation_slots.clear()
@@ -430,10 +531,13 @@ func _refresh_squad() -> void:
 	for i in range(raw_slots.size()):
 		var slot: Dictionary = raw_slots[i]
 		var transformed: Dictionary = slot.duplicate(true)
+		
 		var old_x: float = float(slot.get("x", 0.5))
 		var old_y: float = float(slot.get("y", 0.5))
+		
 		transformed["x"] = 1.0 - old_y
 		transformed["y"] = old_x
+		
 		formation_slots.append(transformed)
 
 	_clear_slots_and_cards()
@@ -453,6 +557,7 @@ func _refresh_squad() -> void:
 	_update_chemistry_and_rating()
 	queue_redraw()
 
+
 func _create_slot_button(slot_index: int) -> void:
 	var btn := Button.new()
 	btn.text = formation_slots[slot_index].position
@@ -468,11 +573,14 @@ func _create_slot_button(slot_index: int) -> void:
 	_apply_position_button_style(btn, false)
 	add_child(btn)
 	slot_buttons.append(btn)
+	
 	btn.position = _get_slot_position(slot_index) - Vector2(30, 20)
+
 
 func _create_field_card(card: PlayerCard, slot_index: int) -> void:
 	if card_ui_scene == null:
 		return
+	
 	var card_node: CardUI = card_ui_scene.instantiate()
 	card_node.z_index = 5
 	add_child(card_node)
@@ -481,10 +589,13 @@ func _create_field_card(card: PlayerCard, slot_index: int) -> void:
 	card_node.set_compact_mode()
 	card_node.setup(card)
 	
-	card_node.card_selected.connect(func(_data): _on_field_card_clicked(slot_index))
+	card_node.card_selected.connect(
+		func(_data): _on_field_card_clicked(slot_index)
+	)
 	
 	card_node.position = _get_slot_position(slot_index) - Vector2(72, 80) * 0.8
 	card_node.scale = Vector2(0.8, 0.8)
+
 
 func _reposition_slots_and_cards() -> void:
 	for i in range(slot_buttons.size()):
@@ -497,14 +608,18 @@ func _reposition_slots_and_cards() -> void:
 			card_node.scale = Vector2(0.8, 0.8)
 			card_node.position = _get_slot_position(i) - Vector2(72, 80) * 0.8
 
+
 func _get_slot_position(slot_index: int) -> Vector2:
 	if slot_index < 0 or slot_index >= formation_slots.size():
 		return field_rect.get_center()
+	
 	var slot: Dictionary = formation_slots[slot_index]
+	
 	return Vector2(
 		field_rect.position.x + field_rect.size.x * float(slot.get("x", 0.5)),
 		field_rect.position.y + field_rect.size.y * float(slot.get("y", 0.5))
 	)
+
 
 func _clear_slots_and_cards() -> void:
 	for btn in slot_buttons:
@@ -517,11 +632,13 @@ func _clear_slots_and_cards() -> void:
 			card.queue_free()
 	field_cards.clear()
 
+
 # ============================================================
 # ВСПЛЫВАЮЩЕЕ МЕНЮ КАРТОЧКИ
 # ============================================================
 func _show_card_popup(slot_index: int) -> void:
 	card_popup_slot_index = slot_index
+	
 	var slot_pos := _get_slot_position(slot_index)
 	
 	var popup_x: float = slot_pos.x + 50
@@ -529,22 +646,31 @@ func _show_card_popup(slot_index: int) -> void:
 	
 	if popup_x + 180 > size.x:
 		popup_x = slot_pos.x - 200
+	
 	if popup_y < 70:
 		popup_y = 70
+	
 	if popup_y + 100 > size.y - 170:
 		popup_y = size.y - 270
 	
 	card_popup.position = Vector2(popup_x, popup_y)
 	card_popup.visible = true
 
+
 func _hide_card_popup() -> void:
 	card_popup.visible = false
 	card_popup_slot_index = -1
 
+
 func _on_popup_replace_pressed() -> void:
 	_hide_card_popup()
+	
 	if card_popup_slot_index >= 0 and card_popup_slot_index < formation_slots.size():
-		_open_player_selector(formation_slots[card_popup_slot_index].position, card_popup_slot_index)
+		_open_player_selector(
+			formation_slots[card_popup_slot_index].position,
+			card_popup_slot_index
+	)
+
 
 func _on_popup_remove_pressed() -> void:
 	var slot_idx := card_popup_slot_index
@@ -554,11 +680,13 @@ func _on_popup_remove_pressed() -> void:
 		return
 	
 	var lineup: Array[PlayerCard] = ClubManager.get_starting_lineup()
+	
 	if slot_idx < lineup.size() and lineup[slot_idx] != null:
 		var card: PlayerCard = lineup[slot_idx]
 		ClubManager.remove_player_from_lineup(card)
 		print("Игрок ", card.player_name, " убран из состава")
 		_refresh_squad()
+
 
 # ============================================================
 # СЫГРАННОСТЬ И РЕЙТИНГ
@@ -582,9 +710,12 @@ func _update_chemistry_and_rating() -> void:
 	
 	if team_rating_label:
 		var avg_rating: int = 0
+		
 		if player_count > 0:
 			avg_rating = total_rating / player_count
+		
 		team_rating_label.text = "Сила команды: " + str(avg_rating)
+
 
 # ============================================================
 # ЗАПАСНЫЕ (С ИСПОЛЬЗОВАНИЕМ ПУЛА CardPool)
@@ -593,12 +724,15 @@ func _refresh_substitutes() -> void:
 	for card_node in subs_cards:
 		if is_instance_valid(card_node) and card_node is CardUI:
 			CardPool.release_card(card_node)
+	
 	subs_cards.clear()
 
 	var subs: Array[PlayerCard] = ClubManager.get_substitutes()
+	
 	for card in subs:
 		if card != null:
 			var card_node: CardUI = CardPool.acquire_card()
+			
 			if card_node == null:
 				push_warning("SquadScreen: не удалось получить карточку из пула")
 				continue
@@ -613,7 +747,9 @@ func _refresh_substitutes() -> void:
 			
 			if card_node.card_selected.is_connected(_on_sub_card_clicked):
 				card_node.card_selected.disconnect(_on_sub_card_clicked)
+			
 			card_node.card_selected.connect(_on_sub_card_clicked.bind(card))
+
 
 # ============================================================
 # ОБРАБОТЧИКИ НАЖАТИЙ
@@ -621,20 +757,25 @@ func _refresh_substitutes() -> void:
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
 
+
 func _on_formation_button_pressed() -> void:
 	_open_formation_selector()
+
 
 func _on_slot_pressed(slot_index: int) -> void:
 	_hide_card_popup()
 	_open_player_selector(formation_slots[slot_index].position, slot_index)
 
+
 func _on_field_card_clicked(slot_index: int) -> void:
 	_show_card_popup(slot_index)
+
 
 func _on_sub_card_clicked(card: PlayerCard) -> void:
 	ClubManager.remove_player_from_substitutes(card)
 	print("Игрок ", card.player_name, " убран из запаса")
 	_refresh_squad()
+
 
 # ============================================================
 # ВЫБОР СХЕМЫ
@@ -654,6 +795,7 @@ func _open_formation_selector() -> void:
 		btn.pressed.connect(func(): _on_formation_selected(f_name))
 		
 		var bg_color: Color = Color(0.1, 0.52, 0.26)
+		
 		if formation_name == current_formation:
 			bg_color = Color(1.0, 0.70, 0.18)
 		
@@ -662,12 +804,14 @@ func _open_formation_selector() -> void:
 	
 	formation_overlay.visible = true
 
+
 func _on_formation_selected(formation_name: String) -> void:
 	current_formation = formation_name
 	ClubManager.set_formation(current_formation)
 	formation_button.text = "Схема: " + current_formation + " ▼"
 	formation_overlay.visible = false
 	_refresh_squad()
+
 
 # ============================================================
 # ВЫБОР ИГРОКА (С ИСПОЛЬЗОВАНИЕМ ПУЛА CardPool)
@@ -684,6 +828,7 @@ func _open_player_selector(required_position: String, slot_index: int = -1) -> v
 	var available_players: Array[PlayerCard] = []
 	
 	var current_card_in_slot: PlayerCard = null
+	
 	if slot_index >= 0 and slot_index < lineup.size():
 		current_card_in_slot = lineup[slot_index]
 	
@@ -695,12 +840,14 @@ func _open_player_selector(required_position: String, slot_index: int = -1) -> v
 			continue
 		
 		var in_lineup: bool = false
+		
 		for c in lineup:
 			if c == card:
 				in_lineup = true
 				break
 		
 		var in_subs: bool = false
+		
 		for c in subs:
 			if c == card:
 				in_subs = true
@@ -717,6 +864,7 @@ func _open_player_selector(required_position: String, slot_index: int = -1) -> v
 	
 	for card in available_players:
 		var card_node: CardUI = CardPool.acquire_card()
+		
 		if card_node == null:
 			push_warning("SquadScreen: не удалось получить карточку из пула для выбора")
 			continue
@@ -728,21 +876,30 @@ func _open_player_selector(required_position: String, slot_index: int = -1) -> v
 		card_node.setup(card)
 		
 		if required_position == "SUBSTITUTE":
-			card_node.card_selected.connect(_on_player_selected_for_sub.bind(card))
+			# card_selected уже передаёт PlayerCard.
+			# bind(card) здесь был ошибкой: он добавлял второй аргумент.
+			card_node.card_selected.connect(_on_player_selected_for_sub)
 		else:
-			card_node.card_selected.connect(_on_player_selected_for_slot.bind(card, slot_index))
+			# card_selected передаёт PlayerCard первым аргументом.
+			# Поэтому bind нужен только для slot_index.
+			card_node.card_selected.connect(
+				_on_player_selected_for_slot.bind(slot_index)
+			)
 	
 	selection_overlay.visible = true
+
 
 func _on_player_selected_for_slot(card: PlayerCard, slot_index: int) -> void:
 	ClubManager.set_player_in_lineup(slot_index, card)
 	selection_overlay.visible = false
 	_refresh_squad()
 
+
 func _on_player_selected_for_sub(card: PlayerCard) -> void:
 	ClubManager.add_player_to_substitutes(card)
 	selection_overlay.visible = false
 	_refresh_squad()
+
 
 # ============================================================
 # СТИЛИ
@@ -762,30 +919,56 @@ func _apply_button_style(button: Button, background_color: Color) -> void:
 	button.add_theme_stylebox_override("normal", normal)
 
 	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
+	hover.bg_color = Color(
+		min(background_color.r + 0.06, 1.0),
+		min(background_color.g + 0.06, 1.0),
+		min(background_color.b + 0.06, 1.0)
+	)
 	button.add_theme_stylebox_override("hover", hover)
 
 	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
+	pressed.bg_color = Color(
+		max(background_color.r - 0.04, 0.0),
+		max(background_color.g - 0.04, 0.0),
+		max(background_color.b - 0.04, 0.0)
+	)
 	button.add_theme_stylebox_override("pressed", pressed)
+
 
 func _apply_position_button_style(button: Button, selected: bool) -> void:
 	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.025, 0.055, 0.085, 0.94) if not selected else Color(1.0, 0.70, 0.18, 0.95)
+	normal.bg_color = (
+		Color(0.025, 0.055, 0.085, 0.94)
+		if not selected
+		else Color(1.0, 0.70, 0.18, 0.95)
+	)
+	
 	normal.corner_radius_top_left = 10
 	normal.corner_radius_top_right = 10
 	normal.corner_radius_bottom_left = 10
 	normal.corner_radius_bottom_right = 10
+	
 	normal.border_width_left = 2
 	normal.border_width_right = 2
 	normal.border_width_top = 2
 	normal.border_width_bottom = 2
-	normal.border_color = Color(1, 1, 1, 0.25) if not selected else Color(1.0, 0.90, 0.40, 1.0)
+	
+	normal.border_color = (
+		Color(1, 1, 1, 0.25)
+		if not selected
+		else Color(1.0, 0.90, 0.40, 1.0)
+	)
+	
 	button.add_theme_stylebox_override("normal", normal)
 	
 	var hover := normal.duplicate()
+	
 	if not selected:
 		hover.bg_color = Color(0.12, 0.18, 0.23, 1.0)
+	
 	button.add_theme_stylebox_override("hover", hover)
 	
-	button.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
+	button.add_theme_color_override(
+		"font_color",
+		Color(1, 1, 1, 0.95)
+	)

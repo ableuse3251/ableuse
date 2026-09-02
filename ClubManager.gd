@@ -20,11 +20,18 @@ func _ready() -> void:
 	_load_club_data()
 
 # ============================================================
+# ПУБЛИЧНАЯ ПЕРЕЗАГРУЗКА (например, после сброса прогресса)
+# ============================================================
+func reload_data() -> void:
+	print("ClubManager: перезагрузка данных клуба...")
+	_load_club_data()
+
+# ============================================================
 # ЗАГРУЗКА ДАННЫХ КЛУБА
 # ============================================================
 func _load_club_data() -> void:
 	print("ClubManager: начинаю загрузку данных...")
-	
+
 	var saved_cards_data: Array = SaveManager.get_club_cards()
 	club_cards.clear()
 	for card_data in saved_cards_data:
@@ -47,6 +54,7 @@ func _load_club_data() -> void:
 
 	var saved_lineup_data: Array = SaveManager.get_starting_lineup()
 	starting_lineup.clear()
+	var lineup_invalid_ids: int = 0
 	for lineup_data in saved_lineup_data:
 		if lineup_data is Dictionary:
 			var player_id: String = str(lineup_data.get("id", ""))
@@ -54,16 +62,31 @@ func _load_club_data() -> void:
 				starting_lineup.append(null)
 			else:
 				var card := _find_card_by_id(player_id)
-				starting_lineup.append(card)
+				if card == null:
+					lineup_invalid_ids += 1
+					push_warning("ClubManager: в сохранённом стартовом составе найден несуществующий ID = '" + player_id + "', слот будет пустым.")
+					starting_lineup.append(null)
+				else:
+					starting_lineup.append(card)
+
+	if lineup_invalid_ids > 0:
+		print("ClubManager: предупреждение: пропущено ", lineup_invalid_ids, " невалидных ID в стартовом составе.")
 
 	var saved_substitutes_data: Array = SaveManager.get_substitutes()
 	substitutes.clear()
+	var subs_invalid_ids: int = 0
 	for sub_data in saved_substitutes_data:
 		if sub_data is Dictionary:
 			var player_id: String = str(sub_data.get("id", ""))
 			var card := _find_card_by_id(player_id)
-			if card != null:
+			if card == null:
+				subs_invalid_ids += 1
+				push_warning("ClubManager: в сохранённых запасных найден несуществующий ID = '" + player_id + "', игрок пропущен.")
+			else:
 				substitutes.append(card)
+
+	if subs_invalid_ids > 0:
+		print("ClubManager: предупреждение: пропущено ", subs_invalid_ids, " невалидных ID в запасных.")
 
 	current_formation = SaveManager.get_formation()
 	if current_formation.is_empty():
@@ -86,6 +109,22 @@ func add_card_to_club(card: PlayerCard) -> void:
 	club_cards.append(card)
 	SaveManager.set_club_cards(club_cards)
 	print("ClubManager: добавлена карта ", card.player_name)
+
+func add_cards_to_club_batch(cards: Array[PlayerCard]) -> void:
+	if cards == null or cards.is_empty():
+		return
+
+	var added: int = 0
+	for card in cards:
+		if card == null:
+			continue
+		club_cards.append(card)
+		added += 1
+
+	if added > 0:
+		SaveManager.set_club_cards(club_cards)
+
+	print("ClubManager: batch-операция: добавлено ", added, " карт в клуб за одно сохранение.")
 
 func remove_card_from_club(card: PlayerCard) -> void:
 	if card == null:
@@ -114,7 +153,7 @@ func get_current_formation() -> String:
 
 func set_formation(formation: String) -> void:
 	current_formation = formation
-	SaveManager.save_formation(current_formation)
+	SaveManager.set_formation(current_formation)
 	print("ClubManager: схема изменена на ", current_formation)
 
 func add_player_to_lineup(card: PlayerCard) -> void:
@@ -137,12 +176,12 @@ func set_player_in_lineup(slot_index: int, card: PlayerCard) -> void:
 		return
 	starting_lineup.erase(card)
 	substitutes.erase(card)
-	
+
 	while starting_lineup.size() <= slot_index:
 		starting_lineup.append(null)
-	
+
 	starting_lineup[slot_index] = card
-	
+
 	SaveManager.save_lineup_and_subs(starting_lineup, substitutes)
 	print("ClubManager: ", card.player_name, " установлен в слот ", slot_index)
 

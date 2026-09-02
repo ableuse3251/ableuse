@@ -17,6 +17,11 @@ var players_by_position: Dictionary = {}
 var players_by_rarity: Dictionary = {}
 var players_by_league: Dictionary = {}
 
+# Быстрый доступ к игроку по ID (O(1) вместо O(n)).
+# Хранит ПЕРВОЕ вхождение ID, чтобы сохранить поведение
+# линейного поиска при гипотетических дубликатах.
+var id_cache: Dictionary = {}
+
 # ============================================================
 # READY
 # ============================================================
@@ -33,6 +38,7 @@ func _load_database() -> void:
 	players_by_position.clear()
 	players_by_rarity.clear()
 	players_by_league.clear()
+	id_cache.clear()
 
 	if not FileAccess.file_exists(DATABASE_PATH):
 		push_error("CardDatabase: файл не найден: " + DATABASE_PATH)
@@ -69,6 +75,8 @@ func _load_database() -> void:
 			continue
 
 		database.append(card)
+		if not id_cache.has(card.id):
+			id_cache[card.id] = card
 		_add_to_position_cache(card)
 		_add_to_rarity_cache(card)
 		_add_to_league_cache(card)
@@ -132,9 +140,8 @@ func get_player_count() -> int:
 	return database.size()
 
 func get_player_by_id(player_id: String) -> PlayerCard:
-	for card: PlayerCard in database:
-		if card.id == player_id:
-			return card
+	if id_cache.has(player_id):
+		return id_cache[player_id]
 	return null
 
 func get_players_by_position(position: String) -> Array[PlayerCard]:

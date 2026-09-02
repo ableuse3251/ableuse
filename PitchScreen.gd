@@ -352,7 +352,7 @@ func _draw() -> void:
 		penalty_box_width,
 		penalty_box_height
 	)
-	
+
 	draw_rect(penalty_box_left, line_color, false, line_width)
 	draw_rect(penalty_box_right, line_color, false, line_width)
 
@@ -370,7 +370,7 @@ func _draw() -> void:
 		goal_box_width,
 		goal_box_height
 	)
-	
+
 	draw_rect(goal_box_left, line_color, false, line_width)
 	draw_rect(goal_box_right, line_color, false, line_width)
 
@@ -388,28 +388,28 @@ func _draw() -> void:
 		goal_depth,
 		goal_width
 	)
-	
+
 	draw_rect(goal_left, Color(0.90, 0.95, 0.92, 0.40), true)
 	draw_rect(goal_right, Color(0.90, 0.95, 0.92, 0.40), true)
 
 	var penalty_spot_offset: float = field_width * 0.11
 	var left_penalty_spot := Vector2(field.position.x + penalty_spot_offset, field.position.y + field_height * 0.5)
 	var right_penalty_spot := Vector2(field.end.x - penalty_spot_offset, field.position.y + field_height * 0.5)
-	
+
 	draw_circle(left_penalty_spot, 3.0, line_color)
 	draw_circle(right_penalty_spot, 3.0, line_color)
 
 	var penalty_arc_radius: float = field_width * 0.135
-	
+
 	var left_box_edge_x: float = field.position.x + penalty_box_width
 	var right_box_edge_x: float = field.end.x - penalty_box_width
-	
+
 	var left_dist_to_edge: float = left_box_edge_x - left_penalty_spot.x
-	var right_dist_to_edge: float = right_penalty_spot.x - right_box_edge_x
-	
+	var right_dist_to_edge: float = right_box_edge_x - right_penalty_spot.x
+
 	var left_arc_angle: float = acos(left_dist_to_edge / penalty_arc_radius)
 	var right_arc_angle: float = acos(right_dist_to_edge / penalty_arc_radius)
-	
+
 	draw_arc(
 		left_penalty_spot,
 		penalty_arc_radius,
@@ -419,7 +419,7 @@ func _draw() -> void:
 		line_color,
 		thin_line_width
 	)
-	
+
 	draw_arc(
 		right_penalty_spot,
 		penalty_arc_radius,
@@ -433,19 +433,9 @@ func _draw() -> void:
 	# ============================================================
 	# УГЛОВЫЕ ДУГИ (ИСПРАВЛЕНО)
 	# ============================================================
-	# В Godot 4 draw_arc рисует дугу против часовой стрелки
-	# в математической системе координат (Y вверх).
-	# Но в экранных координатах (Y вниз) это выглядит как
-	# рисование по часовой стрелке.
-	#
-	# Для каждого угла поля нужно нарисовать четверть круга
-	# внутри угла (внутри поля).
-	# ============================================================
-	
+
 	var corner_radius: float = field_width * 0.02
-	
-	# Верхний левый угол: дуга от 0 до PI/2 (внутри угла)
-	# Центр дуги в левом верхнем углу поля
+
 	draw_arc(
 		field.position,
 		corner_radius,
@@ -455,9 +445,7 @@ func _draw() -> void:
 		line_color,
 		thin_line_width
 	)
-	
-	# Верхний правый угол: дуга от PI/2 до PI (внутри угла)
-	# Центр дуги в правом верхнем углу поля
+
 	draw_arc(
 		Vector2(field.end.x, field.position.y),
 		corner_radius,
@@ -467,9 +455,7 @@ func _draw() -> void:
 		line_color,
 		thin_line_width
 	)
-	
-	# Нижний левый угол: дуга от 3PI/2 до 2PI (внутри угла)
-	# Центр дуги в левом нижнем углу поля
+
 	draw_arc(
 		Vector2(field.position.x, field.end.y),
 		corner_radius,
@@ -479,9 +465,7 @@ func _draw() -> void:
 		line_color,
 		thin_line_width
 	)
-	
-	# Нижний правый угол: дуга от PI до 3PI/2 (внутри угла)
-	# Центр дуги в правом нижнем углу поля
+
 	draw_arc(
 		field.end,
 		corner_radius,
@@ -570,10 +554,10 @@ func _on_formation_selected(formation: Dictionary) -> void:
 			var transformed_slot: Dictionary = slot.duplicate(true)
 			var old_x: float = float(slot.get("x", 0.5))
 			var old_y: float = float(slot.get("y", 0.5))
-			
+
 			transformed_slot["x"] = 1.0 - old_y
 			transformed_slot["y"] = old_x
-			
+
 			formation_slots.append(transformed_slot)
 
 	for child in get_children():
@@ -1051,7 +1035,7 @@ func _create_draft_button() -> void:
 	top_layer.add_child(draft_button)
 
 # ============================================================
-# ЗАВЕРШЕНИЕ ДРАФТА
+# ЗАВЕРШЕНИЕ ДРАФТА (ИСПРАВЛЕНО: Draft → ClubManager → Formation → Lineup → Save → Match
 # ============================================================
 
 func finish_draft() -> void:
@@ -1060,6 +1044,71 @@ func finish_draft() -> void:
 	selecting_position = false
 	_clear_position_buttons()
 
+	# ============================================================
+	# ШАГ 1: ВАЛИДАЦИЯ
+	# ============================================================
+	var expected_count: int = formation_slots.size()
+	if PlayerData.current_draft_team.size() < expected_count:
+		push_error("PitchScreen.finish_draft: драфт не завершён, но выбрано только " + str(PlayerData.current_draft_team.size()) + " из " + str(expected_count) + " игроков. Отмена.")
+		return
+
+	if not is_instance_valid(ClubManager):
+		push_error("PitchScreen.finish_draft: ClubManager не доступен.")
+		return
+
+	# ============================================================
+	# ШАГ 2: СОСТАВИТЬ LINEUP В ПОРЯДКЕ СЛОТОВ ФОРМАЦИИ
+	# ============================================================
+	var ordered_lineup: Array[PlayerCard] = []
+	ordered_lineup.resize(expected_count)
+	for i in range(expected_count):
+		ordered_lineup[i] = null
+
+	for idx in range(selected_slot_indices.size()):
+		var slot_idx: int = selected_slot_indices[idx]
+		var card: PlayerCard = PlayerData.current_draft_team[idx]
+		if slot_idx >= 0 and slot_idx < expected_count and card != null:
+			ordered_lineup[slot_idx] = card
+
+	# ============================================================
+	# ШАГ 3: ДОБАВИТЬ ВСЕ ИГРОКИ В КЛУБ (ОДНО СОХРАНЕНИЕ)
+	# ============================================================
+	var cards_to_add: Array[PlayerCard] = []
+	for c in PlayerData.current_draft_team:
+		if c == null:
+			continue
+		if c in ClubManager.club_cards:
+			continue
+		cards_to_add.append(c)
+
+	if not cards_to_add.is_empty():
+		ClubManager.add_cards_to_club_batch(cards_to_add)
+
+	# ============================================================
+	# ШАГ 4: СОХРАНИТЬ ФОРМАЦИЮ
+	# ============================================================
+	var formation_name: String = str(selected_formation.get("name", ClubManager.current_formation))
+	if not formation_name.is_empty():
+		ClubManager.set_formation(formation_name)
+		print("PitchScreen.finish_draft: формация драфта сохранена: ", formation_name)
+
+	# ============================================================
+	# ШАГ 5: ЗАПИСАТЬ STARTING LINEUP И ОЧИСТИТЬ ЗАПАСНЫЕ
+	# ============================================================
+	ClubManager.starting_lineup = ordered_lineup.duplicate()
+	ClubManager.substitutes.clear()
+	SaveManager.save_lineup_and_subs(ClubManager.starting_lineup, ClubManager.substitutes)
+	print("PitchScreen.finish_draft: стартовый сохранён (", ordered_lineup.size(), " слотов, запасные очищены.")
+
+	# ============================================================
+	# ШАГ 6: ФИНАЛЬНОЕ СОХРАНЕНИЕ ВСЕГО СОСТОЯНИЯ
+	# ============================================================
+	if SaveManager and SaveManager.has_method("save_game"):
+		SaveManager.save_game()
+
+	# ============================================================
+	# ШАГ 7: ЗАПУСК МАТЧА (ТОЛЬКО ПОСЛЕ СОХРАНЕНИЯ!)
+	# ============================================================
 	var match_scene := load("res://MatchScreen.tscn") as PackedScene
 
 	if match_scene == null:
@@ -1073,7 +1122,9 @@ func finish_draft() -> void:
 	add_child(match_screen)
 
 	if match_screen.has_method("setup"):
-		match_screen.setup(PlayerData.current_draft_team)
+		match_screen.setup(ordered_lineup)
+
+	print("PitchScreen.finish_draft: УСПЕХ — драфт_team: ", cards_to_add.size(), " новых игроков в клубе, матч запущен.")
 
 # ============================================================
 # МАГАЗИН

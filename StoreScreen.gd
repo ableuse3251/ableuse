@@ -221,8 +221,23 @@ func _on_buy_pressed() -> void:
 		result_label.text = "❌ Менеджер клуба недоступен."
 		return
 
+	if buy_button and buy_button.disabled:
+		return
+
 	# ============================================================
-	# 1. ПОЛУЧАЕМ ИГРОКА ЧЕРЕЗ CardDatabase (гарантирует все статы)
+	# 1. ПРОВЕРКА И СПИСАНИЕ МОНЕТ (ПЕРВЫМ ДЕЛОМ!)
+	# ============================================================
+	if not user_profile.spend_coins(PACK_PRICE):
+		result_label.text = "❌ Недостаточно монет!\nНужно: " + str(PACK_PRICE) + " монет."
+		return
+
+	# Защита от двойного клика (ставим сразу после успешного списания)
+	buy_button.disabled = true
+
+	_update_coins()
+
+	# ============================================================
+	# 2. ТОЛЬКО ПОСЛЕ ОПЛАТЫ - ГЕНЕРИРУЕМ НАГРАДУ
 	# ============================================================
 	var rarity := _get_random_rarity()
 	print("Пак: выпала редкость ", rarity)
@@ -235,17 +250,13 @@ func _on_buy_pressed() -> void:
 		card = CardDatabase.get_random_player()
 
 	if card == null:
-		result_label.text = "❌ В базе игроков нет доступных игроков."
+		result_label.text = "❌ В базе игроков нет доступных игроков. Ошибка, возврат монет."
+		# Откат: возвращаем монеты, если карту не достали, но мы их уже списали
+		user_profile.add_coins(PACK_PRICE)
+		_update_coins()
+		if is_instance_valid(buy_button):
+			buy_button.disabled = false
 		return
-
-	# ============================================================
-	# 2. ПРОВЕРКА МОНЕТ
-	# ============================================================
-	if not user_profile.spend_coins(PACK_PRICE):
-		result_label.text = "❌ Недостаточно монет!\nНужно: " + str(PACK_PRICE) + " монет."
-		return
-
-	_update_coins()
 
 	# ============================================================
 	# 3. ДОБАВЛЕНИЕ В КЛУБ
@@ -273,8 +284,6 @@ func _on_buy_pressed() -> void:
 		+ "✅ Игрок добавлен в «Мой клуб»!"
 	)
 
-	# Защита от двойного клика
-	buy_button.disabled = true
 	await get_tree().create_timer(0.5).timeout
 	if is_instance_valid(buy_button):
 		buy_button.disabled = false
@@ -297,5 +306,4 @@ func _apply_button_style(button: Button, background_color: Color) -> void:
 	button.add_theme_stylebox_override("pressed", pressed)
 
 func _on_back_pressed() -> void:
-	# ИСПРАВЛЕНО: строгое соответствие правилу унифицированной навигации
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
