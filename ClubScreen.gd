@@ -45,7 +45,7 @@ func _build_ui() -> void:
 	top_margin.add_child(top_hbox)
 
 	var title := Label.new()
-	title.text = "МОЯ КОЛЛЕКЦИЯ"
+	title.text = tr("МОЯ КОЛЛЕКЦИЯ")
 	title.add_theme_font_size_override("font_size", 24)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
 	top_hbox.add_child(title)
@@ -55,12 +55,12 @@ func _build_ui() -> void:
 	top_hbox.add_child(spacer)
 
 	var back_button := Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(100, 40)
 	back_button.add_theme_font_size_override("font_size", 14)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_back_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, Color(0.10, 0.12, 0.17))
 	top_hbox.add_child(back_button)
 
 	var scroll := ScrollContainer.new()
@@ -84,7 +84,7 @@ func _build_ui() -> void:
 	scroll_margin.add_child(cards_container)
 
 	empty_label = Label.new()
-	empty_label.text = "В вашем клубе пока нет игроков.\nОткройте пак в магазине, чтобы получить первого игрока!"
+	empty_label.text = tr("В вашем клубе пока нет игроков.\nОткройте пак в магазине, чтобы получить первого игрока!")
 	empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	empty_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -126,28 +126,12 @@ func _open_player_details(card: PlayerCard) -> void:
 	var details_scene := load("res://PlayerDetailsScreen.tscn") as PackedScene
 	if details_scene == null:
 		push_error("ClubScreen: не удалось загрузить PlayerDetailsScreen.tscn")
+		UIFeedback.show_error(tr("Не удалось открыть карточку игрока"))
 		return
 	var details := details_scene.instantiate()
 	add_child(details)
 	if details.has_method("setup"):
 		details.setup(card)
-
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 8
-	normal.corner_radius_top_right = 8
-	normal.corner_radius_bottom_left = 8
-	normal.corner_radius_bottom_right = 8
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")

@@ -64,14 +64,14 @@ func _build_ui() -> void:
 	margin.add_child(box)
 
 	var title := Label.new()
-	title.text = "⚙️ НАСТРОЙКИ"
+	title.text = tr("⚙️ НАСТРОЙКИ")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 26)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
 	box.add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "Настрой свой клуб под себя"
+	subtitle.text = tr("Настрой свой клуб под себя")
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.add_theme_font_size_override("font_size", 13)
 	subtitle.add_theme_color_override("font_color", Color(1, 1, 1, 0.5))
@@ -106,7 +106,7 @@ func _build_ui() -> void:
 	volume_box.add_child(volume_header)
 
 	var volume_title := Label.new()
-	volume_title.text = "🔊 Громкость"
+	volume_title.text = tr("🔊 Громкость")
 	volume_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	volume_title.add_theme_font_size_override("font_size", 16)
 	volume_title.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
@@ -129,7 +129,7 @@ func _build_ui() -> void:
 	volume_box.add_child(volume_slider)
 
 	var volume_hint := Label.new()
-	volume_hint.text = "0% — выключить звук, 100% — максимум"
+	volume_hint.text = tr("0% — выключить звук, 100% — максимум")
 	volume_hint.add_theme_font_size_override("font_size", 11)
 	volume_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
 	volume_box.add_child(volume_hint)
@@ -138,16 +138,16 @@ func _build_ui() -> void:
 	# ОБУЧЕНИЕ
 	# ============================================================
 	var tutorial_btn := Button.new()
-	tutorial_btn.text = "📖 Повторить обучение"
+	tutorial_btn.text = tr("📖 Повторить обучение")
 	tutorial_btn.custom_minimum_size = Vector2(0, 48)
 	tutorial_btn.add_theme_font_size_override("font_size", 15)
 	tutorial_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	tutorial_btn.pressed.connect(_on_tutorial_pressed)
-	_apply_button_style(tutorial_btn, Color(0.20, 0.28, 0.45))
+	UIStyleUtils.apply_button_style(tutorial_btn, Color(0.20, 0.28, 0.45))
 	box.add_child(tutorial_btn)
 
 	var tutorial_hint := Label.new()
-	tutorial_hint.text = "Покажет учебник заново"
+	tutorial_hint.text = tr("Покажет учебник заново")
 	tutorial_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tutorial_hint.add_theme_font_size_override("font_size", 11)
 	tutorial_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
@@ -183,23 +183,23 @@ func _build_ui() -> void:
 	reset_margin.add_child(reset_box)
 
 	var reset_title := Label.new()
-	reset_title.text = "⚠️ ОПАСНАЯ ЗОНА"
+	reset_title.text = tr("⚠️ ОПАСНАЯ ЗОНА")
 	reset_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	reset_title.add_theme_font_size_override("font_size", 15)
 	reset_title.add_theme_color_override("font_color", Color(1.0, 0.55, 0.55))
 	reset_box.add_child(reset_title)
 
 	reset_button = Button.new()
-	reset_button.text = "🗑️ СБРОСИТЬ ВЕСЬ ПРОГРЕСС"
+	reset_button.text = tr("🗑️ СБРОСИТЬ ВЕСЬ ПРОГРЕСС")
 	reset_button.custom_minimum_size = Vector2(0, 48)
 	reset_button.add_theme_font_size_override("font_size", 15)
 	reset_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	reset_button.pressed.connect(_on_reset_pressed)
-	_apply_button_style(reset_button, Color(0.55, 0.12, 0.12))
+	UIStyleUtils.apply_button_style(reset_button, Color(0.55, 0.12, 0.12))
 	reset_box.add_child(reset_button)
 
 	var reset_hint := Label.new()
-	reset_hint.text = "Клуб, состав, монеты — всё будет удалено"
+	reset_hint.text = tr("Клуб, состав, монеты — всё будет удалено")
 	reset_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	reset_hint.add_theme_font_size_override("font_size", 11)
 	reset_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.45))
@@ -209,12 +209,12 @@ func _build_ui() -> void:
 	# НАЗАД
 	# ============================================================
 	back_button = Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(0, 44)
 	back_button.add_theme_font_size_override("font_size", 15)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_back_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, Color(0.10, 0.12, 0.17))
 	box.add_child(back_button)
 
 func _update_volume_ui() -> void:
@@ -224,9 +224,7 @@ func _update_volume_ui() -> void:
 
 func _on_volume_changed(value: float) -> void:
 	SaveManager.set_master_volume(value)
-	var bus_idx := AudioServer.get_bus_index("Master")
-	AudioServer.set_bus_volume_db(bus_idx, linear_to_db(value))
-	AudioServer.set_bus_mute(bus_idx, value <= 0.001)
+	UserProfile.apply_volume(value)
 	_update_volume_ui()
 
 func _on_tutorial_pressed() -> void:
@@ -283,14 +281,14 @@ func _show_reset_confirmation() -> void:
 	box.add_child(warn_icon)
 
 	var warn_title := Label.new()
-	warn_title.text = "СБРОСИТЬ ПРОГРЕСС?"
+	warn_title.text = tr("СБРОСИТЬ ПРОГРЕСС?")
 	warn_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	warn_title.add_theme_font_size_override("font_size", 20)
 	warn_title.add_theme_color_override("font_color", Color(1.0, 0.55, 0.55))
 	box.add_child(warn_title)
 
 	var warn_text := Label.new()
-	warn_text.text = "Все игроки, состав, монеты и настройки\nбудут удалены. Это действие невозможно отменить."
+	warn_text.text = tr("Все игроки, состав, монеты и настройки") + "\n" + tr("будут удалены. Это действие невозможно отменить.")
 	warn_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	warn_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	warn_text.add_theme_font_size_override("font_size", 13)
@@ -302,21 +300,21 @@ func _show_reset_confirmation() -> void:
 	box.add_child(buttons_row)
 
 	var cancel_btn := Button.new()
-	cancel_btn.text = "Отмена"
+	cancel_btn.text = tr("Отмена")
 	cancel_btn.custom_minimum_size = Vector2(145, 45)
 	cancel_btn.add_theme_font_size_override("font_size", 14)
 	cancel_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	cancel_btn.pressed.connect(overlay.queue_free)
-	_apply_button_style(cancel_btn, Color(0.12, 0.15, 0.20))
+	UIStyleUtils.apply_button_style(cancel_btn, Color(0.12, 0.15, 0.20))
 	buttons_row.add_child(cancel_btn)
 
 	var confirm_btn := Button.new()
-	confirm_btn.text = "Сбросить"
+	confirm_btn.text = tr("Сбросить")
 	confirm_btn.custom_minimum_size = Vector2(145, 45)
 	confirm_btn.add_theme_font_size_override("font_size", 14)
 	confirm_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	confirm_btn.pressed.connect(_confirm_reset.bind(overlay))
-	_apply_button_style(confirm_btn, Color(0.55, 0.12, 0.12))
+	UIStyleUtils.apply_button_style(confirm_btn, Color(0.55, 0.12, 0.12))
 	buttons_row.add_child(confirm_btn)
 
 func _confirm_reset(overlay: Control) -> void:
@@ -327,34 +325,15 @@ func _confirm_reset(overlay: Control) -> void:
 	# карты, состав, запасные и схема из очищенного сохранения.
 	ClubManager.reload_data()
 
-	# Применяем сохранённую громкость (она не сбрасывается).
-	var bus_idx := AudioServer.get_bus_index("Master")
-	var volume := SaveManager.get_master_volume()
-	AudioServer.set_bus_volume_db(bus_idx, linear_to_db(volume))
-	AudioServer.set_bus_mute(bus_idx, volume <= 0.001)
+	# Применяем стандартную громкость (при сбросе настройки тоже очищаются).
+	UserProfile.apply_volume(SaveManager.get_master_volume())
 
 	if is_instance_valid(overlay):
 		overlay.queue_free()
 
-	UIFeedback.show_success("Прогресс сброшен. Начни с чистого листа!")
+	UIFeedback.show_success(tr("Прогресс сброшен. Начни с чистого листа!"))
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
 
-func _apply_button_style(button: Button, bg: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = bg
-	normal.corner_radius_top_left = 12
-	normal.corner_radius_top_right = 12
-	normal.corner_radius_bottom_left = 12
-	normal.corner_radius_bottom_right = 12
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(bg.r + 0.06, 1.0), min(bg.g + 0.06, 1.0), min(bg.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(bg.r - 0.04, 0.0), max(bg.g - 0.04, 0.0), max(bg.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

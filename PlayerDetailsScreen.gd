@@ -1,5 +1,7 @@
 extends Control
 
+const GameColors := preload("res://GameColors.gd")
+
 var player_card: PlayerCard
 
 var overlay: ColorRect
@@ -44,12 +46,7 @@ func _build_ui() -> void:
 
 	overlay = ColorRect.new()
 
-	overlay.color = Color(
-		0.0,
-		0.0,
-		0.0,
-		0.78
-	)
+	overlay.color = GameColors.OVERLAY_DIM
 
 	overlay.set_anchors_and_offsets_preset(
 		Control.PRESET_FULL_RECT
@@ -107,12 +104,7 @@ func _build_ui() -> void:
 	window_style.border_width_top = 1
 	window_style.border_width_bottom = 1
 
-	window_style.border_color = Color(
-		1.0,
-		1.0,
-		1.0,
-		0.15
-	)
+	window_style.border_color = GameColors.BORDER_LIGHT
 
 	window_panel.add_theme_stylebox_override(
 		"panel",
@@ -152,7 +144,7 @@ func _build_ui() -> void:
 
 	var title := Label.new()
 
-	title.text = "ИГРОК"
+	title.text = tr("ИГРОК")
 
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
@@ -319,12 +311,7 @@ func _build_ui() -> void:
 
 	club_label.add_theme_color_override(
 		"font_color",
-		Color(
-			1,
-			1,
-			1,
-			0.70
-		)
+		GameColors.TEXT_SECONDARY
 	)
 
 	main.add_child(club_label)
@@ -347,12 +334,7 @@ func _build_ui() -> void:
 
 	nation_label.add_theme_color_override(
 		"font_color",
-		Color(
-			1,
-			1,
-			1,
-			0.55
-		)
+		GameColors.TEXT_MUTED
 	)
 
 	main.add_child(nation_label)
@@ -394,7 +376,7 @@ func _build_ui() -> void:
 
 	squad_button = Button.new()
 
-	squad_button.text = "В СОСТАВ"
+	squad_button.text = tr("В СОСТАВ")
 
 	squad_button.custom_minimum_size = Vector2(
 		0,
@@ -411,7 +393,7 @@ func _build_ui() -> void:
 	)
 
 	squad_button.pressed.connect(_on_squad_pressed)
-	_apply_button_style(squad_button, Color(0.12, 0.55, 0.28))
+	UIStyleUtils.apply_button_style(squad_button, GameColors.ACCENT_GREEN)
 
 	main.add_child(squad_button)
 
@@ -443,12 +425,7 @@ func _build_ui() -> void:
 
 	placeholder.add_theme_color_override(
 		"font_color",
-		Color(
-			1,
-			1,
-			1,
-			0.20
-		)
+		GameColors.BORDER_FAINT
 	)
 
 	placeholder.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -486,12 +463,7 @@ func _add_stat(
 
 	name_label.add_theme_color_override(
 		"font_color",
-		Color(
-			1,
-			1,
-			1,
-			0.50
-		)
+		GameColors.TEXT_FAINT
 	)
 
 	box.add_child(name_label)
@@ -528,7 +500,7 @@ func _update_player_info() -> void:
 
 	if position_label:
 		position_label.text = (
-			"Позиция: "
+			tr("Позиция: ")
 			+ player_card.position
 		)
 
@@ -549,10 +521,10 @@ func _update_player_info() -> void:
 		var already_in_lineup: bool = player_card in ClubManager.starting_lineup
 		if already_in_lineup:
 			squad_button.disabled = true
-			squad_button.text = "УЖЕ В СОСТАВЕ"
+			squad_button.text = tr("УЖЕ В СОСТАВЕ")
 		else:
 			squad_button.disabled = false
-			squad_button.text = "В СОСТАВ"
+			squad_button.text = tr("В СОСТАВ")
 
 	# ============================================================
 	# ФОТО
@@ -595,41 +567,25 @@ func _apply_rarity_style(rarity: String) -> void:
 		"BRONZE":
 			rarity_label.add_theme_color_override(
 				"font_color",
-				Color(
-					0.75,
-					0.45,
-					0.25
-				)
+				GameColors.RARITY_TEXT_BRONZE
 			)
 
 		"SILVER":
 			rarity_label.add_theme_color_override(
 				"font_color",
-				Color(
-					0.75,
-					0.78,
-					0.82
-				)
+				GameColors.RARITY_TEXT_SILVER
 			)
 
 		"GOLD":
 			rarity_label.add_theme_color_override(
 				"font_color",
-				Color(
-					1.0,
-					0.78,
-					0.20
-				)
+				GameColors.RARITY_TEXT_GOLD
 			)
 
 		"ELITE":
 			rarity_label.add_theme_color_override(
 				"font_color",
-				Color(
-					0.75,
-					0.45,
-					1.0
-				)
+				GameColors.RARITY_TEXT_ELITE
 			)
 
 		_:
@@ -663,6 +619,7 @@ func _on_squad_pressed() -> void:
 
 	if not is_instance_valid(ClubManager):
 		push_warning("PlayerDetailsScreen: ClubManager не доступен, невозможно добавить игрока в состав.")
+		UIFeedback.show_error(tr("Не удалось добавить игрока в состав"))
 		_close()
 		return
 
@@ -688,21 +645,3 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.pressed:
 			if event.keycode == KEY_ESCAPE:
 				_close()
-
-
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 14
-	normal.corner_radius_top_right = 14
-	normal.corner_radius_bottom_left = 14
-	normal.corner_radius_bottom_right = 14
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

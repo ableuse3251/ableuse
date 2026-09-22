@@ -68,6 +68,12 @@ func _load_club_data() -> void:
 					starting_lineup.append(null)
 				else:
 					starting_lineup.append(card)
+		else:
+			# Повреждённый элемент: сохраняем пустой слот,
+			# чтобы индексы остальных игроков не сдвинулись.
+			lineup_invalid_ids += 1
+			push_warning("ClubManager: повреждённый элемент в стартовом составе, слот будет пустым.")
+			starting_lineup.append(null)
 
 	if lineup_invalid_ids > 0:
 		print("ClubManager: предупреждение: пропущено ", lineup_invalid_ids, " невалидных ID в стартовом составе.")
@@ -88,9 +94,8 @@ func _load_club_data() -> void:
 	if subs_invalid_ids > 0:
 		print("ClubManager: предупреждение: пропущено ", subs_invalid_ids, " невалидных ID в запасных.")
 
-	current_formation = SaveManager.get_formation()
-	if current_formation.is_empty():
-		current_formation = "4-4-2"
+	var saved_formation = SaveManager.get_formation()
+	current_formation = saved_formation if not saved_formation.is_empty() else "4-4-2"
 
 	print("ClubManager: загружено карт клуба: ", club_cards.size(), ", в старте: ", starting_lineup.size(), ", в запасе: ", substitutes.size(), ", схема: ", current_formation)
 

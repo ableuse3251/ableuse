@@ -21,6 +21,7 @@ func _select_random_formations() -> void:
 	var all_formations_dict: Dictionary = FormationManager.get_all_formations()
 	if all_formations_dict.is_empty():
 		push_error("FormationSelectScreen: нет доступных схем!")
+		UIFeedback.show_error(tr("Не удалось загрузить схемы"))
 		return
 	
 	var all_list: Array[Dictionary] = []
@@ -53,16 +54,16 @@ func _create_ui() -> void:
 	add_child(top_bar)
 
 	var back_button := Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(100, 45)
 	back_button.add_theme_font_size_override("font_size", 16)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_back_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, Color(0.10, 0.12, 0.17))
 	top_bar.add_child(back_button)
 
 	var title_label := Label.new()
-	title_label.text = "ВЫБОР СХЕМЫ"
+	title_label.text = tr("ВЫБОР СХЕМЫ")
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -75,7 +76,7 @@ func _create_ui() -> void:
 	top_bar.add_child(spacer)
 
 	var subtitle_label := Label.new()
-	subtitle_label.text = "4 случайные схемы из " + str(FormationManager.get_all_formations().size()) + " доступных"
+	subtitle_label.text = tr("4 случайные схемы из ") + str(FormationManager.get_all_formations().size()) + tr(" доступных")
 	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle_label.add_theme_font_size_override("font_size", 14)
 	subtitle_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8, 0.8))
@@ -146,7 +147,7 @@ func _create_formation_card(formation: Dictionary) -> Control:
 	header.add_child(name_label)
 
 	var player_count_label := Label.new()
-	player_count_label.text = str(formation["slots"].size()) + " игроков"
+	player_count_label.text = str(formation["slots"].size()) + tr(" игроков")
 	player_count_label.add_theme_font_size_override("font_size", 14)
 	player_count_label.add_theme_color_override("font_color", Color(0.5, 0.7, 0.9, 0.7))
 	player_count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -214,7 +215,7 @@ func _create_formation_card(formation: Dictionary) -> Control:
 	)
 
 	var select_button := Button.new()
-	select_button.text = "ВЫБРАТЬ"
+	select_button.text = tr("ВЫБРАТЬ")
 	select_button.custom_minimum_size = Vector2(0, 50)
 	select_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	select_button.add_theme_font_size_override("font_size", 16)
@@ -260,20 +261,3 @@ func _create_formation_card(formation: Dictionary) -> Control:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
-
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 12
-	normal.corner_radius_top_right = 12
-	normal.corner_radius_bottom_left = 12
-	normal.corner_radius_bottom_right = 12
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

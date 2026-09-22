@@ -70,7 +70,7 @@ func _build_ui() -> void:
 	top_hbox.add_child(spacer)
 
 	coins_label = Label.new()
-	coins_label.text = "🪙 0"
+	coins_label.text = tr("🪙 ") + "0"
 	coins_label.add_theme_font_size_override("font_size", 18)
 	coins_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.35))
 	top_hbox.add_child(coins_label)
@@ -150,14 +150,14 @@ func _build_ui() -> void:
 	card_vbox.add_child(club_title)
 
 	club_rating_label = Label.new()
-	club_rating_label.text = "Рейтинг: 0"
+	club_rating_label.text = tr("Рейтинг: ") + "0"
 	club_rating_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	club_rating_label.add_theme_font_size_override("font_size", 18)
 	club_rating_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.8))
 	card_vbox.add_child(club_rating_label)
 
 	players_count_label = Label.new()
-	players_count_label.text = "Игроков: 0"
+	players_count_label.text = tr("Игроков: ") + "0"
 	players_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	players_count_label.add_theme_font_size_override("font_size", 16)
 	players_count_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.6))
@@ -169,7 +169,7 @@ func _build_ui() -> void:
 	card_vbox.add_child(divider)
 
 	var status_label := Label.new()
-	status_label.text = "Готов к матчу"
+	status_label.text = tr("Готов к матчу")
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.add_theme_font_size_override("font_size", 14)
 	status_label.add_theme_color_override("font_color", Color(0.5, 1.0, 0.5, 0.9))
@@ -204,11 +204,11 @@ func _build_ui() -> void:
 	nav_hbox.add_theme_constant_override("separation", 8)
 	bottom_margin.add_child(nav_hbox)
 
-	_create_nav_button(nav_hbox, "📦", "Коллекция", _on_collection_pressed, Color(0.15, 0.25, 0.4))
-	_create_nav_button(nav_hbox, "👥", "Мой состав", _on_squad_pressed, Color(0.15, 0.35, 0.25))
-	_create_nav_button(nav_hbox, "🎯", "Драфт", _on_draft_pressed, Color(0.35, 0.2, 0.15))
-	_create_nav_button(nav_hbox, "🛒", "Магазин", _on_store_pressed, Color(0.4, 0.3, 0.1))
-	_create_nav_button(nav_hbox, "⚽", "Матч", _on_match_pressed, Color(0.3, 0.15, 0.15))
+	_create_nav_button(nav_hbox, "📦", tr("Коллекция"), _on_collection_pressed, Color(0.15, 0.25, 0.4))
+	_create_nav_button(nav_hbox, "👥", tr("Мой состав"), _on_squad_pressed, Color(0.15, 0.35, 0.25))
+	_create_nav_button(nav_hbox, "🎯", tr("Драфт"), _on_draft_pressed, Color(0.35, 0.2, 0.15))
+	_create_nav_button(nav_hbox, "🛒", tr("Магазин"), _on_store_pressed, Color(0.4, 0.3, 0.1))
+	_create_nav_button(nav_hbox, "⚽", tr("Матч"), _on_match_pressed, Color(0.3, 0.15, 0.15))
 
 func _create_nav_button(parent: HBoxContainer, icon: String, text: String, callback: Callable, color: Color) -> void:
 	var btn_container := VBoxContainer.new()
@@ -251,12 +251,12 @@ func _create_nav_button(parent: HBoxContainer, icon: String, text: String, callb
 
 func _update_club_info() -> void:
 	if coins_label != null and user_profile != null:
-		coins_label.text = "🪙 " + str(user_profile.coins)
+		coins_label.text = tr("🪙 ") + str(user_profile.coins)
 	
 	if club_manager != null:
 		var cards: Array = club_manager.club_cards
 		if players_count_label != null:
-			players_count_label.text = "Игроков: " + str(cards.size())
+			players_count_label.text = tr("Игроков: ") + str(cards.size())
 		
 		if cards.size() > 0 and club_rating_label != null:
 			var total_rating := 0
@@ -264,7 +264,7 @@ func _update_club_info() -> void:
 				if card is PlayerCard:
 					total_rating += card.rating
 			var avg_rating := total_rating / cards.size()
-			club_rating_label.text = "Рейтинг: " + str(int(avg_rating))
+			club_rating_label.text = tr("Рейтинг: ") + str(int(avg_rating))
 
 func _check_onboarding() -> void:
 	if not SaveManager.is_onboarding_completed():

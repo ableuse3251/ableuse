@@ -42,11 +42,13 @@ func _load_database() -> void:
 
 	if not FileAccess.file_exists(DATABASE_PATH):
 		push_error("CardDatabase: файл не найден: " + DATABASE_PATH)
+		UIFeedback.show_error(tr("Не найден файл базы игроков"))
 		return
 
 	var file: FileAccess = FileAccess.open(DATABASE_PATH, FileAccess.READ)
 	if file == null:
 		push_error("CardDatabase: не удалось открыть " + DATABASE_PATH)
+		UIFeedback.show_error(tr("Не удалось открыть базу игроков"))
 		return
 
 	var content: String = file.get_as_text()
@@ -55,11 +57,13 @@ func _load_database() -> void:
 	var parsed_data: Variant = JSON.parse_string(content)
 	if parsed_data == null or not parsed_data is Dictionary:
 		push_error("CardDatabase: JSON содержит ошибку или не является Dictionary.")
+		UIFeedback.show_error(tr("Файл базы игроков повреждён"))
 		return
 
 	var players_data: Variant = parsed_data.get("players", [])
 	if not players_data is Array:
 		push_error("CardDatabase: поле players должно быть Array.")
+		UIFeedback.show_error(tr("Неверный формат базы игроков"))
 		return
 
 	print("============================================================")

@@ -94,12 +94,12 @@ func _setup_ui() -> void:
 	main_vbox.add_child(top_bar)
 
 	back_button = Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(100, 45)
 	back_button.add_theme_font_size_override("font_size", 16)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_back_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, Color(0.10, 0.12, 0.17))
 	top_bar.add_child(back_button)
 
 	var title := Label.new()
@@ -119,7 +119,7 @@ func _setup_ui() -> void:
 	# ВЕРХНИЙ ИНДИКАТОР
 	# ============================================================
 	round_label = Label.new()
-	round_label.text = "DRAFT  •  ВЫБОР ИГРОКА"
+	round_label.text = tr("DRAFT  •  ВЫБОР ИГРОКА")
 	round_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	round_label.add_theme_font_size_override("font_size", 11)
 	round_label.add_theme_color_override("font_color", Color(0.55, 0.70, 0.90, 0.85))
@@ -130,7 +130,7 @@ func _setup_ui() -> void:
 	# ЗАГОЛОВОК
 	# ============================================================
 	title_label = Label.new()
-	title_label.text = "ВЫБЕРИТЕ ИГРОКА"
+	title_label.text = tr("ВЫБЕРИТЕ ИГРОКА")
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.add_theme_font_size_override("font_size", 27)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.88, 0.38))
@@ -144,7 +144,7 @@ func _setup_ui() -> void:
 	# ПОДЗАГОЛОВОК
 	# ============================================================
 	subtitle_label = Label.new()
-	subtitle_label.text = "Выберите одного игрока для своего состава"
+	subtitle_label.text = tr("Выберите одного игрока для своего состава")
 	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle_label.add_theme_font_size_override("font_size", 13)
 	subtitle_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.55))
@@ -211,7 +211,7 @@ func _setup_ui() -> void:
 	# ПОДСКАЗКА
 	# ============================================================
 	hint_label = Label.new()
-	hint_label.text = "▸  Нажмите на карточку, чтобы выбрать игрока"
+	hint_label.text = tr("▸  Нажмите на карточку, чтобы выбрать игрока")
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 12)
 	hint_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.42))
@@ -231,8 +231,8 @@ func _setup_ui() -> void:
 # ================================================================
 # ВЫБОР ИГРОКА
 # ================================================================
-func start_choice_for_position(pos_name: Variant = "ПОЗИЦИЮ", choices: Array = []) -> void:
-	var real_pos := "ПОЗИЦИЮ"
+func start_choice_for_position(pos_name: Variant = tr("ПОЗИЦИЮ"), choices: Array = []) -> void:
+	var real_pos := tr("ПОЗИЦИЮ")
 	var real_choices := choices
 
 	# ============================================================
@@ -246,8 +246,8 @@ func start_choice_for_position(pos_name: Variant = "ПОЗИЦИЮ", choices: Ar
 	# ============================================================
 	# ЗАГОЛОВКИ
 	# ============================================================
-	title_label.text = "ВЫБЕРИТЕ ИГРОКА"
-	subtitle_label.text = "Позиция: " + real_pos.to_upper() + "  •  выберите одного из вариантов"
+	title_label.text = tr("ВЫБЕРИТЕ ИГРОКА")
+	subtitle_label.text = tr("Позиция: ") + real_pos.to_upper() + tr("  •  выберите одного из вариантов")
 
 	print("DraftSelectScreen: получено вариантов для выбора -> ", real_choices.size())
 
@@ -343,7 +343,7 @@ func start_choice_for_position(pos_name: Variant = "ПОЗИЦИЮ", choices: Ar
 # СТАРЫЙ API
 # ================================================================
 func show_choices(choices: Array) -> void:
-	start_choice_for_position("ПОЗИЦИЮ", choices)
+	start_choice_for_position(tr("ПОЗИЦИЮ"), choices)
 
 # ================================================================
 # НАВИГАЦИЯ
@@ -354,19 +354,3 @@ func _on_back_pressed() -> void:
 # ================================================================
 # СТИЛЬ КНОПКИ
 # ================================================================
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 12
-	normal.corner_radius_top_right = 12
-	normal.corner_radius_bottom_left = 12
-	normal.corner_radius_bottom_right = 12
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

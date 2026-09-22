@@ -1,6 +1,8 @@
 class_name CardUI
 extends Control
 
+const GameColors := preload("res://GameColors.gd")
+
 signal card_selected(player_data)
 
 # ============================================================
@@ -92,15 +94,15 @@ func setup(data: Variant) -> void:
 func _get_rarity_color(rarity: String) -> Color:
 	match rarity.to_upper():
 		"ELITE":
-			return Color(0.2, 0.8, 1.0)    # Яркий голубой/циан для элиты
+			return GameColors.RARITY_ELITE    # Яркий голубой/циан для элиты
 		"GOLD":
-			return Color(0.95, 0.75, 0.2)  # Классический золотой
+			return GameColors.RARITY_GOLD  # Классический золотой
 		"SILVER":
-			return Color(0.75, 0.8, 0.85)  # Серебряный
+			return GameColors.RARITY_SILVER  # Серебряный
 		"BRONZE":
-			return Color(0.65, 0.45, 0.25) # Бронзовый
+			return GameColors.RARITY_BRONZE # Бронзовый
 		_:
-			return Color(0.95, 0.75, 0.2)
+			return GameColors.RARITY_GOLD
 
 # ============================================================
 # СОЗДАНИЕ UI
@@ -129,8 +131,8 @@ func _build_compact_ui() -> void:
 	glow_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	glow_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var glow_style := StyleBoxFlat.new()
-	glow_style.bg_color = Color(1.0, 0.8, 0.2, 0.15)
-	glow_style.shadow_color = Color(0.0, 0.0, 0.0, 0.5)
+	glow_style.bg_color = GameColors.ACCENT_GOLD_GLOW
+	glow_style.shadow_color = GameColors.SHADOW_GLOW
 	glow_style.shadow_size = 4
 	glow_style.set_corner_radius_all(8)
 	glow_panel.add_theme_stylebox_override("panel", glow_style)
@@ -143,10 +145,10 @@ func _build_compact_ui() -> void:
 	var card_style := StyleBoxFlat.new()
 	card_style.bg_color = Color(0.04, 0.06, 0.09, 0.98)
 	card_style.set_border_width_all(2)
-	card_style.border_color = Color(0.95, 0.75, 0.2, 0.9)
+	card_style.border_color = Color(GameColors.RARITY_GOLD, 0.9)
 	card_style.set_corner_radius_all(8)
 	card_style.shadow_size = 3
-	card_style.shadow_color = Color(0.0, 0.0, 0.0, 0.6)
+	card_style.shadow_color = GameColors.SHADOW_CARD
 	main_panel.add_theme_stylebox_override("panel", card_style)
 	add_child(main_panel)
 
@@ -176,7 +178,7 @@ func _build_compact_ui() -> void:
 	rating_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	rating_label.add_theme_font_size_override("font_size", 22)
 	rating_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
-	rating_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	rating_label.add_theme_color_override("font_shadow_color", GameColors.TEXT_SHADOW)
 	rating_label.add_theme_constant_override("shadow_offset_x", 1)
 	rating_label.add_theme_constant_override("shadow_offset_y", 1)
 	top_row.add_child(rating_label)
@@ -197,7 +199,7 @@ func _build_compact_ui() -> void:
 	# 5. Разделитель
 	var separator := ColorRect.new()
 	separator.custom_minimum_size = Vector2(0, 2)
-	separator.color = Color(0.95, 0.75, 0.2, 0.6)
+	separator.color = Color(GameColors.RARITY_GOLD, 0.6)
 	separator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(separator)
 
@@ -215,8 +217,8 @@ func _build_compact_ui() -> void:
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.clip_text = true
 	name_label.add_theme_font_size_override("font_size", 11)
-	name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+	name_label.add_theme_color_override("font_color", GameColors.TEXT_PRIMARY)
+	name_label.add_theme_color_override("font_shadow_color", GameColors.TEXT_SHADOW_STRONG)
 	name_label.add_theme_constant_override("shadow_offset_x", 1)
 	name_label.add_theme_constant_override("shadow_offset_y", 1)
 	name_container.add_child(name_label)
@@ -224,7 +226,7 @@ func _build_compact_ui() -> void:
 	# 7. Нижний декор
 	var bottom_line := ColorRect.new()
 	bottom_line.custom_minimum_size = Vector2(0, 1)
-	bottom_line.color = Color(1.0, 1.0, 1.0, 0.15)
+	bottom_line.color = GameColors.BORDER_LIGHT
 	bottom_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(bottom_line)
 
@@ -250,7 +252,7 @@ func _build_normal_ui() -> void:
 	glow_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var glow_style := StyleBoxFlat.new()
 	glow_style.bg_color = Color(1.0, 0.72, 0.15, 0.07)
-	glow_style.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
+	glow_style.shadow_color = GameColors.SHADOW_GLOW_SOFT
 	glow_style.shadow_size = 10
 	glow_style.set_corner_radius_all(14)
 	glow_panel.add_theme_stylebox_override("panel", glow_style)
@@ -261,12 +263,12 @@ func _build_normal_ui() -> void:
 	main_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	main_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color(0.055, 0.075, 0.11, 1.0)
+	card_style.bg_color = GameColors.BG_PANEL
 	card_style.set_border_width_all(2)
-	card_style.border_color = Color(1.0, 0.78, 0.22, 1.0)
+	card_style.border_color = GameColors.ACCENT_GOLD_DEEP
 	card_style.set_corner_radius_all(10)
 	card_style.shadow_size = 6
-	card_style.shadow_color = Color(0.0, 0.0, 0.0, 0.55)
+	card_style.shadow_color = GameColors.SHADOW_CARD_DEEP
 	main_panel.add_theme_stylebox_override("panel", card_style)
 	add_child(main_panel)
 
@@ -333,7 +335,7 @@ func _build_normal_ui() -> void:
 	rarity_label.text = "BRONZE"
 	rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	rarity_label.add_theme_font_size_override("font_size", 9)
-	rarity_label.add_theme_color_override("font_color", Color(1.0, 0.78, 0.22))
+	rarity_label.add_theme_color_override("font_color", GameColors.ACCENT_GOLD_DEEP)
 	top_row.add_child(rarity_label)
 
 	pos_label = Label.new()
@@ -378,8 +380,8 @@ func _build_normal_ui() -> void:
 	name_label.clip_text = true
 	name_label.custom_minimum_size = Vector2(0, 38)
 	name_label.add_theme_font_size_override("font_size", 15)
-	name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	name_label.add_theme_color_override("font_color", GameColors.TEXT_PRIMARY)
+	name_label.add_theme_color_override("font_shadow_color", GameColors.TEXT_SHADOW)
 	name_label.add_theme_constant_override("shadow_offset_x", 1)
 	name_label.add_theme_constant_override("shadow_offset_y", 1)
 	vbox.add_child(name_label)
@@ -406,7 +408,7 @@ func _build_normal_ui() -> void:
 	# Разделитель статистики
 	var stats_separator := ColorRect.new()
 	stats_separator.custom_minimum_size = Vector2(0, 1)
-	stats_separator.color = Color(1.0, 1.0, 1.0, 0.10)
+	stats_separator.color = GameColors.BORDER_SUBTLE
 	stats_separator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(stats_separator)
 
@@ -436,7 +438,7 @@ func _build_normal_ui() -> void:
 	# Нижний декор
 	var bottom_line := ColorRect.new()
 	bottom_line.custom_minimum_size = Vector2(0, 1)
-	bottom_line.color = Color(1.0, 1.0, 1.0, 0.10)
+	bottom_line.color = GameColors.BORDER_SUBTLE
 	bottom_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(bottom_line)
 
@@ -469,7 +471,7 @@ func _update_ui_values() -> void:
 	if not _ui_built or player_data == null:
 		return
 
-	var p_name: String = "Игрок"
+	var p_name: String = tr("Игрок")
 	var p_rating: int = 80
 	var p_pos: String = "MID"
 	var p_rarity: String = "BRONZE"
@@ -498,7 +500,7 @@ func _update_ui_values() -> void:
 		p_physical = player_data.physical
 
 	elif typeof(player_data) == TYPE_DICTIONARY:
-		p_name = str(player_data.get("player_name", player_data.get("name", "Игрок")))
+		p_name = str(player_data.get("player_name", player_data.get("name", tr("Игрок"))))
 		p_rating = int(player_data.get("rating", player_data.get("overall", 80)))
 		p_pos = str(player_data.get("position", player_data.get("pos", "MID")))
 		p_rarity = str(player_data.get("rarity", "BRONZE"))
@@ -601,10 +603,10 @@ func reset() -> void:
 	if main_panel:
 		var style: StyleBoxFlat = main_panel.get_theme_stylebox("panel")
 		if style:
-			style.border_color = Color(0.95, 0.75, 0.2, 0.9)
+			style.border_color = Color(GameColors.RARITY_GOLD, 0.9)
 	
 	if glow_panel:
 		var glow_style: StyleBoxFlat = glow_panel.get_theme_stylebox("panel")
 		if glow_style:
-			glow_style.bg_color = Color(1.0, 0.8, 0.2, 0.15)
-			glow_style.shadow_color = Color(0.0, 0.0, 0.0, 0.5)
+			glow_style.bg_color = GameColors.ACCENT_GOLD_GLOW
+			glow_style.shadow_color = GameColors.SHADOW_GLOW

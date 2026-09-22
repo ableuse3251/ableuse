@@ -93,16 +93,16 @@ func _setup_ui() -> void:
 	container.add_child(top_bar)
 
 	var back_button := Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(100, 45)
 	back_button.add_theme_font_size_override("font_size", 16)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_home_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, Color(0.10, 0.12, 0.17))
 	top_bar.add_child(back_button)
 
 	var title := Label.new()
-	title.text = "ИТОГИ МАТЧА"
+	title.text = tr("ИТОГИ МАТЧА")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -118,7 +118,7 @@ func _setup_ui() -> void:
 	# ВЕРХНИЙ ЗАГОЛОВОК
 	# ============================================================
 	var match_label := Label.new()
-	match_label.text = "МАТЧ ОКОНЧЕН"
+	match_label.text = tr("МАТЧ ОКОНЧЕН")
 	match_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	match_label.add_theme_font_size_override("font_size", 11)
 	match_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.45))
@@ -128,7 +128,7 @@ func _setup_ui() -> void:
 	# РЕЗУЛЬТАТ
 	# ============================================================
 	title_label = Label.new()
-	title_label.text = "ИТОГ МАТЧА"
+	title_label.text = tr("ИТОГ МАТЧА")
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.add_theme_font_size_override("font_size", 27)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
@@ -162,7 +162,7 @@ func _setup_ui() -> void:
 	# КОМАНДЫ
 	# ============================================================
 	var teams_label := Label.new()
-	teams_label.text = "ВАША КОМАНДА          СОПЕРНИК"
+	teams_label.text = tr("ВАША КОМАНДА          СОПЕРНИК")
 	teams_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	teams_label.add_theme_font_size_override("font_size", 11)
 	teams_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.45))
@@ -192,7 +192,7 @@ func _setup_ui() -> void:
 	# СТАТУС
 	# ============================================================
 	status_label = Label.new()
-	status_label.text = "Матч завершён."
+	status_label.text = tr("Матч завершён.")
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status_label.add_theme_font_size_override("font_size", 15)
@@ -233,7 +233,7 @@ func _setup_ui() -> void:
 	# ЗАГОЛОВОК ХРОНОЛОГИИ
 	# ============================================================
 	var events_title := Label.new()
-	events_title.text = "ХРОНОЛОГИЯ"
+	events_title.text = tr("ХРОНОЛОГИЯ")
 	events_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	events_title.add_theme_font_size_override("font_size", 12)
 	events_title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
@@ -273,24 +273,24 @@ func _setup_ui() -> void:
 
 	# Кнопка "Домой"
 	var home_button := Button.new()
-	home_button.text = "🏠 Домой"
+	home_button.text = tr("🏠 Домой")
 	home_button.custom_minimum_size = Vector2(0, 44)
 	home_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	home_button.add_theme_font_size_override("font_size", 14)
 	home_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	home_button.pressed.connect(_on_home_pressed)
-	_apply_button_style(home_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(home_button, Color(0.10, 0.12, 0.17))
 	buttons.add_child(home_button)
 
 	# Кнопка "Магазин" (отличная возможность потратить заработанные монеты!)
 	var store_button := Button.new()
-	store_button.text = "📦 Магазин"
+	store_button.text = tr("📦 Магазин")
 	store_button.custom_minimum_size = Vector2(0, 44)
 	store_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	store_button.add_theme_font_size_override("font_size", 14)
 	store_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	store_button.pressed.connect(_on_store_pressed)
-	_apply_button_style(store_button, Color(0.4, 0.3, 0.1))
+	UIStyleUtils.apply_button_style(store_button, Color(0.4, 0.3, 0.1))
 	buttons.add_child(store_button)
 
 
@@ -311,26 +311,26 @@ func setup_summary(team: Array, result: Dictionary) -> void:
 	# СЧЁТ
 	# ============================================================
 	score_label.text = str(user_goals) + " : " + str(opponent_goals)
-	minute_label.text = "90' — МАТЧ ОКОНЧЕН"
+	minute_label.text = tr("90' — МАТЧ ОКОНЧЕН")
 
 	# ============================================================
 	# РЕЗУЛЬТАТ
 	# ============================================================
 	if won:
-		title_label.text = "🏆 ПОБЕДА"
-		status_label.text = "Отличный матч! Команда забрала победу."
+		title_label.text = tr("🏆 ПОБЕДА")
+		status_label.text = tr("Отличный матч! Команда забрала победу.")
 		score_label.add_theme_color_override("font_color", Color(0.25, 1.0, 0.45))
-		reward_label.text = "🎁 +500 монет"
+		reward_label.text = tr("🎁 +500 монет")
 	elif draw:
-		title_label.text = "🤝 НИЧЬЯ"
-		status_label.text = "Равный матч. Команды разделили очки."
+		title_label.text = tr("🤝 НИЧЬЯ")
+		status_label.text = tr("Равный матч. Команды разделили очки.")
 		score_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
-		reward_label.text = "🎁 +300 монет"
+		reward_label.text = tr("🎁 +300 монет")
 	else:
-		title_label.text = "МАТЧ ОКОНЧЕН"
-		status_label.text = "На этот раз победить не удалось."
+		title_label.text = tr("МАТЧ ОКОНЧЕН")
+		status_label.text = tr("На этот раз победить не удалось.")
 		score_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.45))
-		reward_label.text = "🎁 +200 монет"
+		reward_label.text = tr("🎁 +200 монет")
 
 	# ============================================================
 	# ХРОНОЛОГИЯ
@@ -339,10 +339,10 @@ func setup_summary(team: Array, result: Dictionary) -> void:
 	var events_text := ""
 
 	if events.is_empty():
-		events_text = "[color=#888888]• Матч прошёл без значимых событий.[/color]"
+		events_text = tr("[color=#888888]• Матч прошёл без значимых событий.[/color]")
 	else:
 		for event_data in events:
-			var event_text := str(event_data.get("text", "Событие матча"))
+			var event_text := str(event_data.get("text", tr("Событие матча")))
 			var event_type := str(event_data.get("type", ""))
 			var event_color := "#CCCCCC"
 
@@ -382,20 +382,3 @@ func _on_store_pressed() -> void:
 # ================================================================
 # СТИЛЬ КНОПКИ
 # ================================================================
-
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 14
-	normal.corner_radius_top_right = 14
-	normal.corner_radius_bottom_left = 14
-	normal.corner_radius_bottom_right = 14
-	button.add_theme_stylebox_override("normal", normal)
-
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

@@ -31,10 +31,7 @@ func _preload_cards() -> void:
 		if card != null:
 			available_cards.append(card)
 
-	print(
-		"CardPool: готово. Доступно карточек: ",
-		available_cards.size()
-	)
+	print("CardPool: готово. Доступно карточек: ", available_cards.size())
 
 
 # ============================================================
@@ -45,6 +42,7 @@ func _create_card() -> CardUI:
 
 	if card == null:
 		push_error("CardPool: не удалось создать CardUI.")
+		UIFeedback.show_error(tr("Ошибка отображения карточки"))
 		return null
 
 	add_child(card)
@@ -69,11 +67,8 @@ func acquire_card() -> CardUI:
 		if active_cards.size() < MAX_POOL_SIZE:
 			card = _create_card()
 		else:
-			push_warning(
-				"CardPool: достигнут лимит пула (",
-				MAX_POOL_SIZE,
-				")"
-			)
+			push_warning("CardPool: достигнут лимит пула (", MAX_POOL_SIZE, ")")
+			UIFeedback.show_error(tr("Слишком много карточек на экране"))
 			return null
 
 	if card == null:
@@ -124,10 +119,7 @@ func release_card(card: CardUI) -> void:
 		return
 
 	if not active_cards.has(card):
-		push_warning(
-			"CardPool: попытка вернуть карточку, "
-			+ "которая не находится в активном списке."
-		)
+		push_warning("CardPool: попытка вернуть карточку, которая не находится в активном списке.")
 		return
 
 	active_cards.erase(card)

@@ -1,6 +1,8 @@
 class_name MatchScreen
 extends Control
 
+const GameColors := preload("res://GameColors.gd")
+
 # ================================================================
 # ДАННЫЕ МАТЧА
 # ================================================================
@@ -67,7 +69,7 @@ func _show_no_team_message() -> void:
 		child.queue_free()
 		
 	var background := ColorRect.new()
-	background.color = Color(0.025, 0.035, 0.055, 1.0)
+	background.color = GameColors.BG_DARK
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(background)
 
@@ -87,35 +89,35 @@ func _show_no_team_message() -> void:
 	vbox.add_child(warning_icon)
 
 	var warning_text := Label.new()
-	warning_text.text = "Сначала собери состав!"
+	warning_text.text = tr("Сначала собери состав!")
 	warning_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	warning_text.add_theme_font_size_override("font_size", 28)
-	warning_text.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
+	warning_text.add_theme_color_override("font_color", GameColors.ACCENT_GOLD)
 	vbox.add_child(warning_text)
 
 	var sub_text := Label.new()
-	sub_text.text = "Перейди в 'Мой состав' и добавь минимум 11 игроков"
+	sub_text.text = tr("Перейди в 'Мой состав' и добавь минимум 11 игроков")
 	sub_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_text.add_theme_font_size_override("font_size", 16)
-	sub_text.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.7))
+	sub_text.add_theme_color_override("font_color", GameColors.TEXT_SECONDARY)
 	vbox.add_child(sub_text)
 
 	var go_to_squad_btn := Button.new()
-	go_to_squad_btn.text = "👥 Перейти к составу"
+	go_to_squad_btn.text = tr("👥 Перейти к составу")
 	go_to_squad_btn.custom_minimum_size = Vector2(250, 50)
 	go_to_squad_btn.add_theme_font_size_override("font_size", 18)
 	go_to_squad_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	go_to_squad_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://SquadScreen.tscn"))
-	_apply_button_style(go_to_squad_btn, Color(0.12, 0.55, 0.28))
+	UIStyleUtils.apply_button_style(go_to_squad_btn, GameColors.ACCENT_GREEN)
 	vbox.add_child(go_to_squad_btn)
 
 	var back_btn := Button.new()
-	back_btn.text = "← Домой"
+	back_btn.text = tr("← Домой")
 	back_btn.custom_minimum_size = Vector2(200, 45)
 	back_btn.add_theme_font_size_override("font_size", 16)
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://HomeScreen.tscn"))
-	_apply_button_style(back_btn, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_btn, GameColors.BTN_NEUTRAL)
 	vbox.add_child(back_btn)
 
 # ================================================================
@@ -123,7 +125,7 @@ func _show_no_team_message() -> void:
 # ================================================================
 func _build_ui() -> void:
 	var background := ColorRect.new()
-	background.color = Color(0.025, 0.035, 0.055, 1.0)
+	background.color = GameColors.BG_DARK
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
@@ -150,12 +152,12 @@ func _build_ui() -> void:
 	main.add_child(top_bar)
 
 	back_button = Button.new()
-	back_button.text = "← Домой"
+	back_button.text = tr("← Домой")
 	back_button.custom_minimum_size = Vector2(100, 45)
 	back_button.add_theme_font_size_override("font_size", 16)
 	back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	back_button.pressed.connect(_on_back_pressed)
-	_apply_button_style(back_button, Color(0.10, 0.12, 0.17))
+	UIStyleUtils.apply_button_style(back_button, GameColors.BTN_NEUTRAL)
 	top_bar.add_child(back_button)
 
 	var title := Label.new()
@@ -164,7 +166,7 @@ func _build_ui() -> void:
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.add_theme_font_size_override("font_size", 22)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.25))
+	title.add_theme_color_override("font_color", GameColors.ACCENT_GOLD)
 	top_bar.add_child(title)
 
 	var spacer := Control.new()
@@ -174,7 +176,7 @@ func _build_ui() -> void:
 	var score_panel := PanelContainer.new()
 	score_panel.custom_minimum_size = Vector2(0, 210)
 	var score_style := StyleBoxFlat.new()
-	score_style.bg_color = Color(0.055, 0.075, 0.11, 1.0)
+	score_style.bg_color = GameColors.BG_PANEL
 	score_style.corner_radius_top_left = 24
 	score_style.corner_radius_top_right = 24
 	score_style.corner_radius_bottom_left = 24
@@ -183,7 +185,7 @@ func _build_ui() -> void:
 	score_style.border_width_right = 1
 	score_style.border_width_top = 1
 	score_style.border_width_bottom = 1
-	score_style.border_color = Color(1, 1, 1, 0.10)
+	score_style.border_color = GameColors.BORDER_SUBTLE
 	score_panel.add_theme_stylebox_override("panel", score_style)
 	main.add_child(score_panel)
 
@@ -198,7 +200,7 @@ func _build_ui() -> void:
 	score_box.add_child(teams_row)
 
 	home_name_label = Label.new()
-	home_name_label.text = "ВАША КОМАНДА"
+	home_name_label.text = tr("ВАША КОМАНДА")
 	home_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	home_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	home_name_label.add_theme_font_size_override("font_size", 17)
@@ -209,11 +211,11 @@ func _build_ui() -> void:
 	vs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vs_label.custom_minimum_size = Vector2(40, 40)
 	vs_label.add_theme_font_size_override("font_size", 13)
-	vs_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.45))
+	vs_label.add_theme_color_override("font_color", GameColors.TEXT_DIVIDER)
 	teams_row.add_child(vs_label)
 
 	away_name_label = Label.new()
-	away_name_label.text = "СОПЕРНИК"
+	away_name_label.text = tr("СОПЕРНИК")
 	away_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	away_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	away_name_label.add_theme_font_size_override("font_size", 17)
@@ -261,19 +263,19 @@ func _build_ui() -> void:
 	main.add_child(progress_bar)
 
 	status_label = Label.new()
-	status_label.text = "МАТЧ НАЧИНАЕТСЯ"
+	status_label.text = tr("МАТЧ НАЧИНАЕТСЯ")
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.add_theme_font_size_override("font_size", 18)
 	main.add_child(status_label)
 
 	event_label = Label.new()
-	event_label.text = "Следим за событиями матча..."
+	event_label.text = tr("Следим за событиями матча...")
 	event_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	event_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	event_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	event_label.custom_minimum_size = Vector2(0, 80)
 	event_label.add_theme_font_size_override("font_size", 17)
-	event_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.85))
+	event_label.add_theme_color_override("font_color", GameColors.TEXT_MAIN)
 	main.add_child(event_label)
 
 	var expand := Control.new()
@@ -281,12 +283,12 @@ func _build_ui() -> void:
 	main.add_child(expand)
 
 	play_button = Button.new()
-	play_button.text = "НАЧАТЬ МАТЧ"
+	play_button.text = tr("НАЧАТЬ МАТЧ")
 	play_button.custom_minimum_size = Vector2(0, 55)
 	play_button.add_theme_font_size_override("font_size", 18)
 	play_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	play_button.pressed.connect(_on_play_pressed)
-	_apply_button_style(play_button, Color(0.12, 0.55, 0.28))
+	UIStyleUtils.apply_button_style(play_button, GameColors.ACCENT_GREEN)
 	main.add_child(play_button)
 
 func _start_match() -> void:
@@ -302,9 +304,9 @@ func _start_match() -> void:
 	away_score_label.text = "0"
 	minute_label.text = "0'"
 	progress_bar.value = 0
-	status_label.text = "МАТЧ ГОТОВ"
-	event_label.text = "Ваша команда выходит на поле."
-	play_button.text = "НАЧАТЬ МАТЧ"
+	status_label.text = tr("МАТЧ ГОТОВ")
+	event_label.text = tr("Ваша команда выходит на поле.")
+	play_button.text = tr("НАЧАТЬ МАТЧ")
 	play_button.disabled = false
 
 func _on_play_pressed() -> void:
@@ -314,7 +316,7 @@ func _on_play_pressed() -> void:
 	if not match_started:
 		match_started = true
 		play_button.disabled = true
-		status_label.text = "МАТЧ ИДЁТ..."
+		status_label.text = tr("МАТЧ ИДЁТ...")
 		_start_match_timer()
 
 func _start_match_timer() -> void:
@@ -355,29 +357,29 @@ func _process_events() -> void:
 func _display_event(event_data: Dictionary) -> void:
 	var event_type: String = str(event_data.get("type", ""))
 	var is_user: bool = bool(event_data.get("is_user", false))
-	var text: String = str(event_data.get("text", "Событие матча"))
+	var text: String = str(event_data.get("text", tr("Событие матча")))
 	event_label.text = text
 
 	if event_type == "goal":
 		if is_user:
 			var current_score: int = int(home_score_label.text)
 			home_score_label.text = str(current_score + 1)
-			status_label.text = "⚽ ГОЛ ВАШЕЙ КОМАНДЫ!"
+			status_label.text = tr("⚽ ГОЛ ВАШЕЙ КОМАНДЫ!")
 		else:
 			var current_score: int = int(away_score_label.text)
 			away_score_label.text = str(current_score + 1)
-			status_label.text = "⚽ ГОЛ СОПЕРНИКА!"
+			status_label.text = tr("⚽ ГОЛ СОПЕРНИКА!")
 		return
 
 	match event_type:
 		"chance":
-			status_label.text = "ОПАСНЫЙ МОМЕНТ"
+			status_label.text = tr("ОПАСНЫЙ МОМЕНТ")
 		"yellow":
-			status_label.text = "🟨 ЖЁЛТАЯ КАРТОЧКА"
+			status_label.text = tr("🟨 ЖЁЛТАЯ КАРТОЧКА")
 		"red":
-			status_label.text = "🟥 КРАСНАЯ КАРТОЧКА"
+			status_label.text = tr("🟥 КРАСНАЯ КАРТОЧКА")
 		_:
-			status_label.text = "СОБЫТИЕ МАТЧА"
+			status_label.text = tr("СОБЫТИЕ МАТЧА")
 
 func _finish_match() -> void:
 	if match_finished:
@@ -397,16 +399,16 @@ func _finish_match() -> void:
 	away_score_label.text = str(final_opponent_goals)
 
 	if final_user_goals > final_opponent_goals:
-		status_label.text = "🏆 ПОБЕДА!"
+		status_label.text = tr("🏆 ПОБЕДА!")
 	elif final_user_goals < final_opponent_goals:
-		status_label.text = "ПОРАЖЕНИЕ"
+		status_label.text = tr("ПОРАЖЕНИЕ")
 	else:
-		status_label.text = "🤝 НИЧЬЯ"
+		status_label.text = tr("🤝 НИЧЬЯ")
 
-	event_label.text = "Матч завершён!"
+	event_label.text = tr("Матч завершён!")
 	_give_match_reward()
 	play_button.disabled = false
-	play_button.text = "ПОСМОТРЕТЬ РЕЗУЛЬТАТ"
+	play_button.text = tr("ПОСМОТРЕТЬ РЕЗУЛЬТАТ")
 
 func _give_match_reward() -> void:
 	if reward_given:
@@ -436,6 +438,7 @@ func _show_summary() -> void:
 	var summary_scene := load("res://MatchSummaryScreen.tscn") as PackedScene
 	if summary_scene == null:
 		push_error("Не удалось загрузить MatchSummaryScreen.tscn")
+		UIFeedback.show_error(tr("Не удалось открыть итоги матча"))
 		return
 	var summary := summary_scene.instantiate()
 	add_child(summary)
@@ -446,18 +449,3 @@ func _on_back_pressed() -> void:
 	if is_instance_valid(match_timer):
 		match_timer.stop()
 	get_tree().change_scene_to_file("res://HomeScreen.tscn")
-
-func _apply_button_style(button: Button, background_color: Color) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = background_color
-	normal.corner_radius_top_left = 14
-	normal.corner_radius_top_right = 14
-	normal.corner_radius_bottom_left = 14
-	normal.corner_radius_bottom_right = 14
-	button.add_theme_stylebox_override("normal", normal)
-	var hover := normal.duplicate()
-	hover.bg_color = Color(min(background_color.r + 0.06, 1.0), min(background_color.g + 0.06, 1.0), min(background_color.b + 0.06, 1.0))
-	button.add_theme_stylebox_override("hover", hover)
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color(max(background_color.r - 0.04, 0.0), max(background_color.g - 0.04, 0.0), max(background_color.b - 0.04, 0.0))
-	button.add_theme_stylebox_override("pressed", pressed)

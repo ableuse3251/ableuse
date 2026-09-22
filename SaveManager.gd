@@ -2,15 +2,34 @@ extends Node
 
 const SAVE_PATH: String = "user://save.json"
 
-var save_data: Dictionary = {
-	"coins": 1000,
-	"club_cards": [],
-	"starting_lineup": [],
-	"substitutes": [],
-	"formation": "4-4-2",
-	"onboarding_completed": false,
-	"master_volume": 1.0
-}
+# ============================================================
+# ВЕРСИОНИРОВАНИЕ ФОРМАТА СОХРАНЕНИЯ
+# ============================================================
+# SAVE_VERSION — текущая версия формата save-файла.
+# Увеличивай её при каждом изменении структуры данных и добавляй
+# миграцию в _upgrade_save_data() (инструкция — в блоке "МИГРАЦИИ").
+#   0 — сейвы «до версионирования» (без поля save_version);
+#   1 — первый версионированный формат (текущий).
+const SAVE_VERSION: int = 1
+
+var save_data: Dictionary = {}
+
+func _ready() -> void:
+	save_data = _default_save_data()
+
+# Единый источник данных «с нуля»: используется при первом запуске,
+# при отсутствующем/повреждённом файле и при сбросе прогресса.
+func _default_save_data() -> Dictionary:
+	return {
+		"save_version": SAVE_VERSION,
+		"coins": 1000,
+		"club_cards": [],
+		"starting_lineup": [],
+		"substitutes": [],
+		"formation": "4-4-2",
+		"onboarding_completed": false,
+		"master_volume": 1.0
+	}
 
 # ============================================================
 # ЗАГРУЗКА / СОХРАНЕНИЕ
@@ -19,41 +38,127 @@ var save_data: Dictionary = {
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("SaveManager: сохранение не найдено. Используются начальные данные.")
+		save_data = _default_save_data()
 		return
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
 		UIFeedback.report_error("SaveManager", "Не удалось открыть файл сохранения.")
+		save_data = _default_save_data()
 		return
 
 	var content: String = file.get_as_text()
 	file.close()
 
 	var parsed_data = JSON.parse_string(content)
-	if parsed_data is Dictionary:
-		save_data = parsed_data
-		_ensure_defaults()
-		print("SaveManager: сохранение загружено.")
-	else:
+	if not (parsed_data is Dictionary):
 		UIFeedback.report_error("SaveManager", "Файл сохранения повреждён. Используются начальные данные.")
+		save_data = _default_save_data()
+		return
 
-func _ensure_defaults() -> void:
-	if not save_data.has("starting_lineup"):
-		save_data["starting_lineup"] = []
-	if not save_data.has("club_cards"):
-		save_data["club_cards"] = []
-	if not save_data.has("substitutes"):
-		save_data["substitutes"] = []
-	if not save_data.has("coins"):
-		save_data["coins"] = 1000
-	if not save_data.has("formation"):
-		save_data["formation"] = "4-4-2"
-	if not save_data.has("onboarding_completed"):
-		save_data["onboarding_completed"] = false
-	if not save_data.has("master_volume"):
-		save_data["master_volume"] = 1.0
+	save_data = parsed_data
+
+	# Миграция старого формата к актуальному.
+	var upgraded: bool = _upgrade_save_data()
+
+	# Страховка: даже в актуальном формате могло не хватать отдельных полей
+	# (например, файл правили вручную) — дополняем значениями по умолчанию.
+	_ensure_defaults(save_data)
+
+	if upgraded:
+		save_game()
+	else:
+		print("SaveManager: сохранение загружено (версия %d)." % _get_save_version())
+
+func _ensure_defaults(data: Dictionary) -> void:
+	if not data.has("starting_lineup"):
+		data["starting_lineup"] = []
+	if not data.has("club_cards"):
+		data["club_cards"] = []
+	if not data.has("substitutes"):
+		data["substitutes"] = []
+	if not data.has("coins"):
+		data["coins"] = 1000
+	if not data.has("formation"):
+		data["formation"] = "4-4-2"
+	if not data.has("onboarding_completed"):
+		data["onboarding_completed"] = false
+	if not data.has("master_volume"):
+		data["master_volume"] = 1.0
+
+
+# ============================================================
+# МИГРАЦИИ ФОРМАТА СОХРАНЕНИЯ
+# ============================================================
+# КАК ДОБАВИТЬ НОВУЮ МИГРАЦИЮ:
+#   1. Увеличь SAVE_VERSION на 1 (например, 1 -> 2).
+#   2. Если появились новые поля — добавь их в _default_save_data().
+#   3. Напиши функцию _migrate_vN_to_vN1(data: Dictionary), которая
+#      переводит данные из версии N в N+1 (изменяет data на месте).
+#      Миграция обязана быть идемпотентной (повторный запуск безопасен).
+#   4. Зарегистрируй её в match внутри _upgrade_save_data() под ключом N.
+#   5. Проверь, что старый сейв открывается и в файле появляется
+#      новый save_version.
+# ============================================================
+
+# Приводит save_data к актуальной версии формата.
+# Возвращает true, если данные изменились (тогда файл пересохраняется).
+func _upgrade_save_data() -> bool:
+	var from_version: int = _get_save_version()
+
+	if from_version == SAVE_VERSION:
+		return false
+
+	if from_version > SAVE_VERSION:
+		# Файл из более новой сборки игры: неизвестные поля сохраняем
+		# как есть, миграции не запускаем (downgrade-safe).
+		push_warning("SaveManager: версия сохранения %d новее поддерживаемой %d — миграция пропущена." % [from_version, SAVE_VERSION])
+		return false
+
+	var version: int = from_version
+	while version < SAVE_VERSION:
+		match version:
+			# ── ЗАРЕГИСТРИРОВАННЫЕ МИГРАЦИИ ─────────────────────
+			0:
+				_migrate_v0_to_v1(save_data)
+			# 1:
+			#	_migrate_v1_to_v2(save_data)
+			# ────────────────────────────────────────────────────
+			_:
+				push_warning("SaveManager: нет миграции с версии %d — данные будут дополнены значениями по умолчанию." % version)
+				_ensure_defaults(save_data)
+		version += 1
+
+	save_data["save_version"] = SAVE_VERSION
+	print("SaveManager: формат сохранения мигрирован: %d -> %d." % [from_version, SAVE_VERSION])
+	return true
+
+
+# Версия формата в текущих данных. Отсутствие/мусор => 0 (легаси-сейв).
+func _get_save_version() -> int:
+	var raw = save_data.get("save_version", 0)
+	if raw is int:
+		return int(raw)
+	if raw is float:
+		return int(raw)
+	if raw is String and raw.is_valid_int():
+		return int(raw)
+	return 0
+
+
+# v0 -> v1: сейв «до версионирования» (без поля save_version).
+# Тогда часть ключей могла отсутствовать — дополняем значениями по умолчанию.
+func _migrate_v0_to_v1(data: Dictionary) -> void:
+	_ensure_defaults(data)
+
 
 func save_game() -> void:
+	# Помечаем файл актуальной версией формата, чтобы миграции не
+	# запускались повторно. Номер версии сейва из более новой сборки
+	# игры не понижаем.
+	if _get_save_version() <= SAVE_VERSION:
+		save_data["save_version"] = SAVE_VERSION
+
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		UIFeedback.report_error("SaveManager", "Не удалось создать файл сохранения.")
@@ -91,15 +196,7 @@ func set_master_volume(value: float) -> void:
 # ============================================================
 
 func reset_progress() -> void:
-	save_data = {
-		"coins": 1000,
-		"club_cards": [],
-		"starting_lineup": [],
-		"substitutes": [],
-		"formation": "4-4-2",
-		"onboarding_completed": false,
-		"master_volume": save_data.get("master_volume", 1.0)
-	}
+	save_data = _default_save_data()
 	save_game()
 	print("SaveManager: прогресс сброшен. Начальные данные восстановлены.")
 
@@ -145,8 +242,10 @@ func set_coins(value: int) -> void:
 	save_game()
 
 func get_coins(default_value: int = 1000) -> int:
-	if save_data.has("coins"):
-		return int(save_data["coins"])
+	var raw = save_data.get("coins", default_value)
+	if raw is int or raw is float:
+		return int(maxf(float(raw), 0.0))
+	# Повреждённое значение (строка, null, Dictionary и т.п.) — fallback.
 	return default_value
 
 func set_club_cards(cards: Array) -> void:
